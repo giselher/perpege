@@ -1,0 +1,7 @@
+name="Test-Map";
+start_position=(600, 600);
+ground="grounds/Teppich_Test_low.png";
+layers={"layer1" : [{ "type" : "Immobile", "pos" : (700, 500), "file" : "img/Desk.img.gz"},
+					{ "type" : "Immobile", "pos" : (500, 500), "file" : "img/Wastepaperbasket.img.gz"}, 
+					{ "type" : "Immobile", "pos" : (800, 800), "file" : "img/Schrank_tmp.img.gz"}]};
+
