@@ -24,8 +24,10 @@ AnimatedObject (inherit form MovableObject)
         
 """
 
-from pygame import Sprite, Surface
+from pygame import Surface
+from pygame.sprite import Sprite
 from pygame import draw as _draw
+
 
 class Object(Sprite):
     
