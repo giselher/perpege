@@ -29,15 +29,11 @@ def init():
     #only for current working
     setImagePath("./content/")
 
-
-def geteval(section, key):
-    """
-    DEPTRECATED!!!
-    Don't call this! Could be dangerous and security risk
-    Should make gettuple or getlist functions to replace this function!
-    """
+def gettuple(section, key):
     global __cp
-    return eval(__cp.get(section, key))
+    value = __cp.get(section, key)
+    value_list = value.replace('(', '').replace(')', '').split(',')
+    return (int(value_list[0]), int(value_list[1]))
 
 def getbool(section, key):
     global __cp

@@ -1,15 +1,23 @@
 """
 @author Alexander Preisinger
 
-Provides different tools for working with pg.
+Provides different tools for working with pygame.
 """
-import os.path, math
-import pygame as pg
 from Decorator import Cache
+import os.path, math
+import pygame
+
 __curdir = os.path.abspath(os.path.curdir)
 __IMAGE_PATH = __curdir
 __SOUND_PATH = __curdir
 __VIDEO_PATH = __curdir
+
+def setAllPaths(path):
+    """\
+    Set the image, sound and video path at once.
+    """
+    global __IMAGE_PATH, __SOUND_PATH, __VIDEO_PATH
+    __IMAGE_PATH, __SOUND_PATH, __VIDEO_PATH = path
 
 def setImagePath(path):
     global __IMAGE_PATH
@@ -42,8 +50,8 @@ def loadImage(name, colorkey=None):
     fullname = os.path.join(__IMAGE_PATH, name)
     fullname = os.path.sep.join(fullname.split('/'))
     try:
-        image = pg.image.load(fullname)
-    except pg.error, message:
+        image = pygame.image.load(fullname)
+    except pygame.error, message:
         print 'cannot load image:', name
         raise SystemExit, message
     if image.get_alpha():
@@ -52,20 +60,20 @@ def loadImage(name, colorkey=None):
         image = image.convert()
         if colorkey is not None:
             colorkey = image.get_at((0,0))
-        image.set_colorkey(colorkey, pg.RLEACCEL)
+        image.set_colorkey(colorkey, pygame.RLEACCEL)
     return image
 
 @Cache()
 def loadSound(name):
     class NoneSound(object):
         def play(self): pass
-    if not pg.mixer:
+    if not pygame.mixer:
         return NoneSound()
     fullname = os.path.join(__SOUND_PATH, name)
     fullname = os.path.sep.join(fullname.split('/'))
     try:
-        sound = pg.mixer.Sound(fullname)
-    except pg.error, message:
+        sound = pygame.mixer.Sound(fullname)
+    except pygame.error, message:
         print 'Cannot load sound:', fullname
         raise SystemExit, message
     return sound
@@ -74,15 +82,15 @@ def loadVideo(name):
     fullname = os.path.join(__VIDEO_PATH, name)
     fullname = os.path.sep.join(fullname.split('/'))
     try:
-        video = pg.movie.Movie(fullname)
-    except pg.error, message:
+        video = pygame.movie.Movie(fullname)
+    except pygame.error, message:
         print 'Cannot load sound:', fullname
         raise SystemExit, message
     return video
 
 def zOrder(*groups):
-    ordered = pg.sprite.OrderedUpdates()
-    unordered = pg.sprite.Group(groups)
+    ordered = pygame.sprite.OrderedUpdates()
+    unordered = pygame.sprite.Group(groups)
     counter = 0
     while True:
         if len(unordered) == 0: return ordered

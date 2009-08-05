@@ -3,14 +3,16 @@ from actor import Actor
 from engine.Decorator import Cache, Log
 from engine.Object import ImmobileObject, MovableObject, AnimatedObject
 from engine.Misc import loadImage, getImagePath
-import pygame as pg
+import pygame
+from pygame.locals import *
 import gzip, os.path, pickle
 
 
-class World(pg.sprite.Sprite, LayerContainer):
+class World(pygame.sprite.Sprite, LayerContainer):
     
-    def __init__(self, display_surface):
-        pg.sprite.Sprite.__init__(self)
+    def __init__(self, display_surface, state_handler):
+        self.state = state_handler
+        pygame.sprite.Sprite.__init__(self)
         LayerContainer.__init__(self, 3)
         self.display = display_surface
         self.display_rect = self.display.get_rect()
@@ -31,6 +33,12 @@ class World(pg.sprite.Sprite, LayerContainer):
 
     def move(self, coord):
         self.rect.move_ip(coord)
+    
+    def key_loop(self):
+        for event in pygame.event.get():
+            if event.type == KEYDOWN:
+                if event.key == K_ESC:
+                    self.state.change('menu')
 
 class MapMaker(object):
     
@@ -44,7 +52,7 @@ class MapMaker(object):
 
     def makeMap(self, map_id):
         self.__map.start_position = map_id["start_position"]
-        self.__map.setImage(pg.transform.scale(loadImage(map_id["ground"]), (3200, 2400)))
+        self.__map.setImage(pygame.transform.scale(loadImage(map_id["ground"]), (3200, 2400)))
         
         for layer in map_id["layers"]:
             ln = int(layer.replace("layer", "")) -1
@@ -57,7 +65,7 @@ class MapMaker(object):
 
 @Cache()        
 def loadObject(object_type, object_data):
-    _fromstring = pg.image.fromstring
+    _fromstring = pygame.image.fromstring
     img_file = gzip.open(os.path.join(getImagePath(), \
         object_data["file"]), "rb", 1)
     file_data = pickle.load(img_file)
