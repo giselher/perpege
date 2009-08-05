@@ -4,8 +4,7 @@ import pygame
 from pygame.locals import *
 import engine, settings
 from engine.Misc import loadImage
-from reader import Reader
-from map import MapMaker, World
+from map import World
 from gui.menu import MainMenu
 
 class StateHandler(object):
@@ -53,34 +52,29 @@ def main():
     
     world = World(screen, State) 
     menu = MainMenu(screen, State)
-
-    MapReader = Reader('./content/maps/')
-    map_data = MapReader.readFile('01_test.map')
-    map_maker = MapMaker(world)
-    map_maker.makeMap(map_data)
+    
+    menu.store_action('new_game', State.set_state_game)
+    menu.store_action('quit', quit)
 
     input = engine.I2d4axis()
 
-    menu.store_action('new_game', State.set_state_game)
-    menu.store_action('quit', quit)
     while True:
         screen.fill((0, 0, 0))
-        clock.tick(50)
+        clock.tick(30)
         for event in pygame.event.get():
             if event.type == QUIT: quit()
             elif event.type == KEYDOWN:
                 if event.key == K_q: quit()
-                elif event.key == K_r:
-                    Map_Maker.makeMap(map_data)
                 else:
                     pygame.event.post(event)
             else:
                 pygame.event.post(event)
             
-        _state = str(State)
+        _state = State.state
         if _state == 'game':
             world.key_loop()
-            world.move(input.loop(-20))
+            world.loop()
+            world.move(input.loop(-15))
             world.draw()
         elif _state == 'menu':
             menu.key_loop()
@@ -94,6 +88,3 @@ if __name__ == "__main__":
         main()
     except KeyboardInterrupt, message:
         print "KeyboardInterrupt", message
-
-
-

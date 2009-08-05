@@ -108,12 +108,13 @@ class MovableObject(Object):
         """
         Object.__init__(self, surface, position, collision_rect)
         
-    def move(self, direction):
+    
+    def move(sefl, coord):
         """(x, y)
         Moves the object.
         """
-        self.rect.move_ip(direction)
-        self.crect.move_ip(direction)
+        self.rect.move_ip(coord)
+        self.crect.move_ip(coord)
         
 class AnimatedObject(MovableObject):
     
@@ -147,7 +148,6 @@ class AnimatedObject(MovableObject):
         """
         self.image = animations[0]
         self.rect = self.image.get_rect()
-        self.crect = self.rect
         self.__animations = animations
         self.__max_count = len(animations)-1
         
