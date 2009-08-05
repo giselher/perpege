@@ -37,7 +37,7 @@ class World(pygame.sprite.Sprite, LayerContainer):
     def key_loop(self):
         for event in pygame.event.get():
             if event.type == KEYDOWN:
-                if event.key == K_ESC:
+                if event.key == K_ESCAPE:
                     self.state.change('menu')
 
 class MapMaker(object):
@@ -45,10 +45,10 @@ class MapMaker(object):
     def __init__(self, container):
         self.__map = container
                     
-        self.objects = {"Immobile": ImmobileObject,
-                        "Movable": MovableObject,
-                        "Animated": AnimatedObject,
-                        "Actor": Actor}
+        self.objects = {'Immobile': ImmobileObject,
+                        'Movable': MovableObject,
+                        'Animated': AnimatedObject,
+                        'Actor': Actor}
 
     def makeMap(self, map_id):
         self.__map.start_position = map_id["start_position"]

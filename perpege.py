@@ -12,11 +12,14 @@ class StateHandler(object):
     
     def __init__(self, state):
         self.state = state
+        self.previous = None
         
     def change(self, state):
+        self.previous = self.state
         self.state = state
-        
+
     def set_state_game(self):
+        self.previous = self.state
         self.state = 'game'
         
     def __str__(self):
@@ -49,8 +52,7 @@ def main():
     State = StateHandler('menu')
     
     world = World(screen, State) 
-    menu = MainMenu(screen)
-
+    menu = MainMenu(screen, State)
 
     MapReader = Reader('./content/maps/')
     map_data = MapReader.readFile('01_test.map')
@@ -60,6 +62,7 @@ def main():
     input = engine.I2d4axis()
 
     menu.store_action('new_game', State.set_state_game)
+    menu.store_action('quit', quit)
     while True:
         screen.fill((0, 0, 0))
         clock.tick(50)
@@ -67,11 +70,6 @@ def main():
             if event.type == QUIT: quit()
             elif event.type == KEYDOWN:
                 if event.key == K_q: quit()
-##                elif event.key == K_F3:
-##                    sys.path.append('../tools/')
-##                    import collrectsetter as crs
-##                    crs.main()
-##                    init()
                 elif event.key == K_r:
                     Map_Maker.makeMap(map_data)
                 else:

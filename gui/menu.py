@@ -42,8 +42,9 @@ class MenuButton(pygame.sprite.Sprite):
 
 class MainMenu(pygame.sprite.Sprite):
     
-    def __init__(self, screen, bg_image_path=None):
+    def __init__(self, screen, state_handler, bg_image_path=None):
         pygame.sprite.Sprite.__init__(self)
+        self.state = state_handler
         self.__group = pygame.sprite.Group()
         self.loadImage = engine.Misc.loadImage
         self.screen = screen
@@ -76,12 +77,17 @@ class MainMenu(pygame.sprite.Sprite):
         self.__group.draw(self.screen)
         self.__group.empty()
         
+    def resume(self):
+        if self.state.previous is not None:
+            self.state.change(self.state.previous)
+        
     def key_loop(self):
         for event in pygame.event.get():
             if event.type == KEYDOWN:
                 if event.key == K_DOWN: self.key_down()
                 elif event.key == K_UP: self.key_up()
                 elif event.key == K_RETURN: self.key_return()
+                elif event.key == K_ESCAPE: self.resume()
             
     def key_down(self):
         self.buttons[self.sel_button].normal()
