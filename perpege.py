@@ -7,6 +7,8 @@ from engine.Misc import loadImage
 from map import World
 from gui.menu import MainMenu
 
+from gui.debug import blit_fps
+
 class StateHandler(object):
     
     def __init__(self, state):
@@ -51,7 +53,7 @@ def main():
     State = StateHandler('menu')
     
     world = World(screen, State) 
-    menu = MainMenu(screen, State)
+    menu = MainMenu(State, 'menu.jpg')
     
     menu.store_action('new_game', State.set_state_game)
     menu.store_action('quit', quit)
@@ -78,8 +80,9 @@ def main():
             world.draw()
         elif _state == 'menu':
             menu.key_loop()
-            menu.draw()
+            menu.draw(screen)
 
+        blit_fps(clock, screen, (10, 10))
         _display_flip()
         
 

@@ -6,7 +6,8 @@ from engine.Misc import loadImage, getImagePath
 import pygame
 from pygame.locals import *
 import gzip, os.path, pickle
-
+import threading
+         
 
 class World(pygame.sprite.Sprite):
     
@@ -25,6 +26,7 @@ class World(pygame.sprite.Sprite):
         self.setImage(image)
         self.bg_image = image.copy()
 
+
     def setImage(self, surface):
         self.image = surface
         self.rect = surface.get_rect()
@@ -32,12 +34,12 @@ class World(pygame.sprite.Sprite):
             self.display_rect[1]/2 - self.start_position[1])
         
     def draw(self):
-        self.image = self.bg_image.copy()
         self.Objects.draw(self.image)
         self.Actors.draw(self.image)
         self.display.blit(self.image, self.rect.topleft)
 
     def move(self, coord):
+        self.image = self.bg_image.copy()
         self.rect.move_ip(coord)
     
     def key_loop(self):
@@ -59,7 +61,7 @@ class MapMaker(object):
 
     def makeMap(self, map_id):
         start_position = map_id['start_position']
-        image = pygame.transform.scale(loadImage(map_id['ground']), (2000, 1600))
+        image = loadImage(map_id['ground'])
         
         for object in map_id['objects']:
             if object['type'] == 'Actor':

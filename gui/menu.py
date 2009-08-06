@@ -42,12 +42,11 @@ class MenuButton(pygame.sprite.Sprite):
 
 class MainMenu(pygame.sprite.Sprite):
     
-    def __init__(self, screen, state_handler, bg_image_path=None):
+    def __init__(self, state_handler, bg_image_path=None):
         pygame.sprite.Sprite.__init__(self)
         self.state = state_handler
         self.__group = pygame.sprite.Group()
         self.loadImage = engine.Misc.loadImage
-        self.screen = screen
         
         self.sel_button = 0
 
@@ -70,11 +69,11 @@ class MainMenu(pygame.sprite.Sprite):
             if button.name == button_name:
                 button.store_action(function)
 
-    def draw(self):
+    def draw(self, surface):
         for button in self.buttons:
             self.__group.add(button)
-        self.screen.blit(self.image, (0, 0))
-        self.__group.draw(self.screen)
+        surface.blit(self.image, (0, 0))
+        self.__group.draw(surface)
         self.__group.empty()
         
     def resume(self):
