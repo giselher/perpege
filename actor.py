@@ -9,7 +9,7 @@ class SAS:
 class Actor(MovableObject, SAS):
 
     def __init__(self, animations, position, col_rect, sas_id=None):
-        MovableObject.__init__(self, pygame.Surface((0, 0)), position, col_rect)
+        MovableObject.__init__(self, animations['down'][0], position, col_rect)
         self.id = sas_id
         
         self.animations = animations
@@ -18,10 +18,9 @@ class Actor(MovableObject, SAS):
                             'down' : [0, 1],
                             'left' : [-1, 0],
                             'right' : [1, 0]}
-        self.step = 6
-        self.w_step = 0    
-        self.i_step = 0
+        self.step = 5 
         self.a_step = 0
+        self.i_step = 0
         self.prev_dir = 'right' 
         
     def collision_prediction(self):
@@ -29,13 +28,13 @@ class Actor(MovableObject, SAS):
         
     def animate(self, dir):
         if dir == self.prev_dir:
-            if self.w_step > 2:
-                self.w_step = 0
+            if self.a_step == 1:
                 self.i_step += 1
+                self.a_step = 0
             else:
-                self.w_step += 1
+                self.a_step += 1
         else:
-            self.w_step = 0
+            self.a_step = 0
             self.i_step = 0
         try:
             self.image = self.animations[dir][self.i_step]

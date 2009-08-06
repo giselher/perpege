@@ -3,6 +3,5 @@ start_position=(600, 600);
 ground="grounds/Teppich_Test_low.jpg";
 objects=[{ "type" : "Object", "pos" : (700, 500), "file" : "img/Desk.img.gz"},
 		{ "type" : "Object", "pos" : (500, 500), "file" : "img/Wastepaperbasket.img.gz"}, 
-		{ "type" : "Object", "pos" : (800, 800), "file" : "img/Schrank_tmp.img.gz"},
-		{ "type" : "Actor", "pos" : (600, 600), "file" : "ani/Ives.ani.gz"}]
+		{ "type" : "Actor", "pos" : (600, 600), "file" : "ani/Yves.ani.gz"}]
 
