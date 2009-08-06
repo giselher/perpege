@@ -22,7 +22,7 @@ class Actor(MovableObject, SAS):
         self.w_step = 0    
         self.i_step = 0
         self.a_step = 0
-        self.prev_dir = 'right'
+        self.prev_dir = 'right' 
         
     def collision_prediction(self):
         pass
@@ -44,7 +44,7 @@ class Actor(MovableObject, SAS):
             
     def loop(self):
         _choice = self.prev_dir
-        self.animate(_choice)
+        self.animate(_choice) 
         direction = self.directions[_choice]
         direction = [direction[0]*self.step, direction[1]*self.step]
         self.rect.move_ip(direction)

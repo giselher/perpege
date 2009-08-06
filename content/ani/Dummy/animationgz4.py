@@ -22,9 +22,10 @@ def load_image(name, colorkey=None):
             colorkey = image.get_at((0,0))
         image.set_colorkey(colorkey, pygame.RLEACCEL)
     return image
-
-img_filename = raw_input("-->")
-path = os.path.join(_curdir, img_filename)
+if len(sys.argv) == 1:
+    print 'please pass a filename'
+    sys.exit()
+path = sys.argv[1]
 if os.path.exists(path): img_file = gzip.open(path)
 else:
     print "file doesn't exist"
@@ -47,55 +48,31 @@ ani_data = {"format": img_data["format"],
                 }
             }
 
-r = os.listdir(os.path.join(_curdir, "r"))
-l = os.listdir(os.path.join(_curdir, "l"))
-d = os.listdir(os.path.join(_curdir, "d"))
-u = os.listdir(os.path.join(_curdir, "u"))
-dr = os.listdir(os.path.join(_curdir, "dr"))
-dl = os.listdir(os.path.join(_curdir, "dl"))
-ul = os.listdir(os.path.join(_curdir, "ul"))
-ur = os.listdir(os.path.join(_curdir, "ur"))
 
 pygame.display.init()
 pygame.display.set_mode((1,1))
 
-for name in r:
-    image = load_image(os.path.join("r", name))
-    ani_data["animation"]["right"].append(pygame.image.tostring(image, img_data["format"]))
-
-for name in l:
-    image = load_image(os.path.join("l", name))
-    ani_data["animation"]["left"].append(pygame.image.tostring(image, img_data["format"]))
-    
-for name in d:
-    image = load_image(os.path.join("d", name))
-    ani_data["animation"]["down"].append(pygame.image.tostring(image, img_data["format"]))
-    
-for name in u:
-    image = load_image(os.path.join("u", name))
-    ani_data["animation"]["up"].append(pygame.image.tostring(image, img_data["format"]))
-
-for name in dr:
-    image = load_image(os.path.join("dr", name))
-    ani_data["animation"]["downright"].append(pygame.image.tostring(image, img_data["format"]))
-
-for name in dl:
-    image = load_image(os.path.join("dl", name))
-    ani_data["animation"]["downleft"].append(pygame.image.tostring(image, img_data["format"]))
-    
-for name in ul:
-    image = load_image(os.path.join("ul", name))
-    ani_data["animation"]["upleft"].append(pygame.image.tostring(image, img_data["format"]))
-    
-for name in ur:
-    image = load_image(os.path.join("ur", name))
-    ani_data["animation"]["upright"].append(pygame.image.tostring(image, img_data["format"]))
+def add_animation(directory, direction):
+        _cur = os.listdir(os.path.join(_curdir, directory))
+        for name in _cur:
+            if not name.startswith("."):
+                image = load_image(os.path.join(directory, name))
+                ani_data["animation"][direction].append(pygame.image.tostring(image, img_data["format"]))
+                
+add_animation('r', 'right')
+add_animation('l', 'left')
+add_animation('u', 'up')
+add_animation('d', 'down')
+add_animation('dl', 'downleft')
+add_animation('dr', 'downright')
+add_animation('ur', 'upright')
+add_animation('ul', 'upleft')
 
 ani_data["image_string"] = ani_data["animation"]["down"][0]    
 ani_data["portrait"] = pygame.image.tostring(load_image("portrait.png"), img_data["format"])
     
     
-ani_file = gzip.open(img_filename.split(".")[0]+".ani.gz", "wb", 1)
+ani_file = gzip.open(path.split(".")[0]+".ani.gz", "wb", 1)
 pickle.dump(ani_data, ani_file, 1)
 ani_file.close()
 print "succes"
