@@ -36,10 +36,12 @@ class Actor(MovableObject, SAS):
         else:
             self.a_step = 0
             self.i_step = 0
+            self.prev_dir = dir
         try:
             self.image = self.animations[dir][self.i_step]
         except IndexError:
             self.i_step = 0
+        
             
     def loop(self):
         _choice = self.prev_dir
@@ -51,5 +53,12 @@ class Actor(MovableObject, SAS):
         
 class Player(Actor):
     
-    def __init__(self):
-        Actor.__init__(self)
+    def __init__(self, animations, position, col_rect, sas_id=None):
+        Actor.__init__(self, animations, position, col_rect, sas_id=None)
+
+        
+    
+##        self.directions = { [0, -1] :  'up',
+##                            [0, 1] : 'down',
+##                            [-1, 0] : 'left',
+##                            [1, 0] : 'right'}

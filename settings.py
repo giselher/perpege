@@ -2,7 +2,7 @@ import os, sys
 from engine import setImagePath
 from ConfigParser import ConfigParser 
 
-VERSION = '0.0.1'
+VERSION = '0.0.2'
 
 def __getPath():
     os_name = sys.platform

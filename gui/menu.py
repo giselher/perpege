@@ -64,17 +64,18 @@ class MainMenu(pygame.sprite.Sprite):
                   
         self.buttons[self.sel_button].hover()
         
+        for button in self.buttons:
+            self.__group.add(button)
+        
     def store_action(self, button_name, function):
         for button in self.buttons:
             if button.name == button_name:
                 button.store_action(function)
 
     def draw(self, surface):
-        for button in self.buttons:
-            self.__group.add(button)
+        self.key_loop()
         surface.blit(self.image, (0, 0))
         self.__group.draw(surface)
-        self.__group.empty()
         
     def resume(self):
         if self.state.previous is not None:

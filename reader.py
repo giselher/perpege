@@ -32,7 +32,9 @@ class Reader(object):
             if not line.startswith('#'):
                 linedata = line.split('=')
                 if len(linedata) == 2:
-                    mapdata[linedata[0]] = eval(linedata[1])
+                    if linedata[1].startswith('[') or linedata[1].startswith('(') \
+                            or linedata[1].startswith('"'):
+                        mapdata[linedata[0]] = eval(linedata[1])
         return mapdata
     
     def __readNpcFile(self, lines):
@@ -78,7 +80,7 @@ class Reader(object):
         for line in lines: 
             if line.startswith('#'): lines.remove(line)
         content = ''.join(lines)
-        counter = 1
+        counter = 0
         sentences = content.split(':')
         for line in sentences:
             linedata = line.split('=')               
