@@ -2,7 +2,7 @@
 import os, sys
 import pygame
 from pygame.locals import *
-import engine, settings
+import settings
 from engine.Misc import loadImage
 from map import World
 from gui.menu import MainMenu
@@ -58,8 +58,6 @@ def main():
     menu.store_action('new_game', State.set_state_game)
     menu.store_action('quit', quit)
 
-    input = engine.I2d4axis()
-
     while True:
         screen.fill((0, 0, 0))
         clock.tick(30)
@@ -74,9 +72,7 @@ def main():
             
         _state = State.state
         if _state == 'game':
-            world.key_loop()
             world.loop()
-            world.move(input.loop(-15))
             world.draw()
         elif _state == 'menu':
             menu.key_loop()
@@ -89,5 +85,5 @@ def main():
 if __name__ == "__main__":
     try:
         main()
-    except KeyboardInterrupt, message:
-        print "KeyboardInterrupt", message
+    except KeyboardInterrupt:
+        print "KeyboardInterrupt"

@@ -1,8 +1,9 @@
 from actor import Actor
 from reader import Reader
 from engine.Decorator import Cache, Log
-from engine.Object import ImmobileObject, MovableObject, AnimatedObject
+from engine.Object import MovableObject, AnimatedObject
 from engine.Misc import loadImage, getImagePath
+from engine import Input
 import pygame
 from pygame.locals import *
 import gzip, os.path, pickle
@@ -16,6 +17,7 @@ class World(pygame.sprite.Sprite):
         self.state = state_handler
         self.display = display_surface
         self.display_rect = self.display.get_rect()
+        self.input = Input.I2d4axis()
         
         self.Actors = pygame.sprite.Group()
         self.Objects = pygame.sprite.Group()
@@ -34,12 +36,13 @@ class World(pygame.sprite.Sprite):
             self.display_rect[1]/2 - self.start_position[1])
         
     def draw(self):
+        self.image = self.bg_image.copy()
         self.Objects.draw(self.image)
         self.Actors.draw(self.image)
         self.display.blit(self.image, self.rect.topleft)
 
+
     def move(self, coord):
-        self.image = self.bg_image.copy()
         self.rect.move_ip(coord)
     
     def key_loop(self):
@@ -49,6 +52,8 @@ class World(pygame.sprite.Sprite):
                     self.state.change('menu')
                     
     def loop(self):
+        self.key_loop()
+        self.move(self.input(-20))
         for sprite in self.Actors.sprites():
             sprite.loop()
         

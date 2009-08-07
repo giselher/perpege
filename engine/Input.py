@@ -18,7 +18,7 @@ class I2d2axis(object):
         else: return[0, y*step]
     
     def __call__(self, step):
-        self.loop(step)
+        return self.loop(step)
         
 class I2d4axis(object):
         
@@ -31,4 +31,4 @@ class I2d4axis(object):
         return [x*step, y*step]        
 
     def __call__(self, step):
-        self.loop(step)
+        return self.loop(step)
