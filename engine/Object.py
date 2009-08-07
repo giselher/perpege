@@ -46,7 +46,7 @@ class Object(Sprite):
         self.__crect_rel_y = self.crect.y
         
         self.rect.topleft = position
-        self.crect.topleft = (self.rect.x+self.__crect_rel_y, self.rect.y+self.__crect_rel_y)
+        self.crect.topleft = (self.rect.x+self.__crect_rel_x, self.rect.y+self.__crect_rel_y)
     
     def drawRects(self, surface):
         """

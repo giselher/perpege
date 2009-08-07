@@ -8,12 +8,16 @@ class SAS:
 
 class Actor(MovableObject, SAS):
 
-    def __init__(self, animations, position, col_rect, sas_id=None):
+    def __init__(self, animations, position, col_rect, sas=None, ta=None):
         MovableObject.__init__(self, animations['down'][0], position, col_rect)
-        self.id = sas_id
+        
+        print col_rect, self.crect
+        self.diff_x = self.crect.x - self.rect.x
+        self.diff_y = self.crect.y - self.rect.y    
+        
+        print self.diff_x, self.diff_y   
         
         self.animations = animations
-        self.choices = ['left', 'right', 'up', 'down']
         self.directions = { 'up' : [0, -1],
                             'down' : [0, 1],
                             'left' : [-1, 0],
@@ -41,8 +45,11 @@ class Actor(MovableObject, SAS):
             self.image = self.animations[dir][self.i_step]
         except IndexError:
             self.i_step = 0
+    
+    def clamp(self, rect):
+        self.crect.clamp_ip(rect)
+        self.rect.topleft = (self.crect.x-self.diff_x, self.crect.y-self.diff_y)
         
-            
     def loop(self):
         _choice = self.prev_dir
         self.animate(_choice) 
@@ -51,13 +58,14 @@ class Actor(MovableObject, SAS):
         self.rect.move_ip(direction)
         self.crect.move_ip(direction)
         
+        
 class Player(Actor):
     
-    def __init__(self, animations, position, col_rect, sas_id=None):
+    def __init__(self, animations, position, col_rect, sas=None):
         image = animations['down'][0]
         rect = image.get_rect()
         rect.center = position
-        Actor.__init__(self, animations, rect.topleft, col_rect, sas_id=None)
+        Actor.__init__(self, animations, rect.topleft, col_rect)
 
     def loop(self):
         pass

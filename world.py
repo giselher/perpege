@@ -15,6 +15,7 @@ class World(object):
         self.state = state_handler
         self.display = display_surface
         self.display_rect = self.display.get_rect()
+        self.display_center = self.display_rect.center
         self.input = Input.I2d4axis()
         
         self.step = 10
@@ -55,6 +56,12 @@ class World(object):
         self.image.blit(self.ground, (0, 0))
         self.Objects.draw(self.image)
         self.Actors.draw(self.image)
+        for sprite in self.Objects.sprites():
+            sprite.drawRects(self.image)
+        for sprite in self.Actors.sprites():
+            sprite.clamp(self.image.get_rect())
+            sprite.drawRects(self.image)
+        self.player.drawRects(self.image)
         self.display.blit(self.image, self.rect.topleft)
         self.display.blit(self.player.image, self.player.rect.topleft)
 
@@ -85,6 +92,7 @@ class World(object):
         self.key_loop()
         for sprite in self.Actors.sprites():
             sprite.loop()
+            
         self.move()
         self.draw()
         
@@ -123,6 +131,7 @@ def loadObject(object_data):
             file_data['collision_rect'])
     
     elif object_data['type'] == 'Actor':
+        print file_data['collision_rect']
         for direction in file_data['animation']:
             animations[direction] = []
             for image_string in file_data['animation'][direction]:
