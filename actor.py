@@ -54,11 +54,10 @@ class Actor(MovableObject, SAS):
 class Player(Actor):
     
     def __init__(self, animations, position, col_rect, sas_id=None):
-        Actor.__init__(self, animations, position, col_rect, sas_id=None)
+        image = animations['down'][0]
+        rect = image.get_rect()
+        rect.center = position
+        Actor.__init__(self, animations, rect.topleft, col_rect, sas_id=None)
 
-        
-    
-##        self.directions = { [0, -1] :  'up',
-##                            [0, 1] : 'down',
-##                            [-1, 0] : 'left',
-##                            [1, 0] : 'right'}
+    def loop(self):
+        pass
