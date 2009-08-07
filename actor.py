@@ -11,12 +11,9 @@ class Actor(MovableObject, SAS):
     def __init__(self, animations, position, col_rect, sas=None, ta=None):
         MovableObject.__init__(self, animations['down'][0], position, col_rect)
         
-        print col_rect, self.crect
         self.diff_x = self.crect.x - self.rect.x
         self.diff_y = self.crect.y - self.rect.y    
-        
-        print self.diff_x, self.diff_y   
-        
+
         self.animations = animations
         self.directions = { 'up' : [0, -1],
                             'down' : [0, 1],
@@ -62,10 +59,11 @@ class Actor(MovableObject, SAS):
 class Player(Actor):
     
     def __init__(self, animations, position, col_rect, sas=None):
-        image = animations['down'][0]
-        rect = image.get_rect()
-        rect.center = position
-        Actor.__init__(self, animations, rect.topleft, col_rect)
+        Actor.__init__(self, animations, position, col_rect)
+        
+    def setCenter(self, coord):
+        self.rect.center = coord
+        self.crect.topleft = (self.rect.x+self.diff_x, self.rect.y+self.diff_y)
 
     def loop(self):
         pass

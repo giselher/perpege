@@ -15,7 +15,7 @@ class MenuButton(pygame.sprite.Sprite):
         self.name = name
         
         self.font = pygame.font.Font('content/tahoma.ttf', 24)
-        self.image = self.font.render(text, False, (255, 255, 255))
+        self.image = self.font.render(text, True, (255, 255, 255))
         self.rect = self.image.get_rect()
         
         self.rect.center = position

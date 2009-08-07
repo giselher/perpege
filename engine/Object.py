@@ -109,7 +109,7 @@ class MovableObject(Object):
         Object.__init__(self, surface, position, collision_rect)
         
     
-    def move(sefl, coord):
+    def move(self, coord):
         """(x, y)
         Moves the object.
         """

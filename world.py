@@ -2,12 +2,11 @@ from actor import Actor, Player
 from reader import Reader
 from engine.Decorator import Cache
 from engine.Object import MovableObject
-from engine.Misc import loadImage, getImagePath
+from engine.Misc import loadImage, getImagePath, zOrder
 from engine import Input
 import pygame
 from pygame.locals import *
 import gzip, os.path, pickle
-         
 
 class World(object):
     
@@ -24,13 +23,13 @@ class World(object):
         self.image = None
         self.rect = None
         
-        self.Actors = pygame.sprite.Group()
-        self.Objects = pygame.sprite.Group()
-        
         self.player = loadObject({'type': 'Player', 'pos' : (self.display_rect.width/2, \
             self.display_rect.height/2) ,'file' : 'ani/Dummy.ani.gz'})
         
-        self.map_maker = MapMaker(self.Actors, self.Objects)
+        self.Actors = [self.player]
+        self.Objects = []
+        self.DrawGroup = pygame.sprite.Group(self.player)
+        self.map_maker = MapMaker(self.DrawGroup, self.Actors, self.Objects)
         self.map_reader = Reader('content/maps/')
         
         self.start_position, image = self.map_maker.makeMap(self.map_reader.readFile('01_test.map'))
@@ -49,21 +48,16 @@ class World(object):
         self.ground = surface
         self.rect = surface.get_rect()
         self.image = pygame.Surface(self.rect.size)
-        self.rect.topleft = (self.display_rect[0]/2 - self.start_position[0],\
-            self.display_rect[1]/2 - self.start_position[1])
+        self.rect.topleft = (self.display_rect.width/2-self.start_position[0],\
+            self.display_rect.height/2 - self.start_position[1])
+        self.player.setPosition(self.start_position)
         
     def draw(self):
         self.image.blit(self.ground, (0, 0))
-        self.Objects.draw(self.image)
-        self.Actors.draw(self.image)
-        for sprite in self.Objects.sprites():
+        zOrder(self.DrawGroup).draw(self.image)
+        for sprite in self.DrawGroup.sprites():
             sprite.drawRects(self.image)
-        for sprite in self.Actors.sprites():
-            sprite.clamp(self.image.get_rect())
-            sprite.drawRects(self.image)
-        self.player.drawRects(self.image)
         self.display.blit(self.image, self.rect.topleft)
-        self.display.blit(self.player.image, self.player.rect.topleft)
 
     def key_loop(self):
         for event in pygame.event.get():
@@ -73,8 +67,10 @@ class World(object):
                     
     def move(self):
         direction = self.input(-self.step)
+        _direction = [direction[0]*-1,direction[1]*-1]
+        self.player.move(_direction)
+        self.player.clamp(self.ground.get_rect())
         self.rect.move_ip(direction)
-
         if direction[0] < 0:
             direction[0] = 1
         elif direction[0] > 0:
@@ -90,27 +86,30 @@ class World(object):
                     
     def loop(self):
         self.key_loop()
-        for sprite in self.Actors.sprites():
-            sprite.loop()
-            
         self.move()
+        for sprite in self.Actors:
+            sprite.loop()
+            sprite.clamp(self.ground.get_rect())
+
         self.draw()
         
 class MapMaker(object):
     
-    def __init__(self, actor_group, object_group):
-        self.__actors = actor_group
-        self.__objects = object_group
+    def __init__(self, draw_group, actor_list, object_list):
+        self.__draw = draw_group
+        self.__actors = actor_list
+        self.__objects = object_list
 
     def makeMap(self, map_id):
         start_position = map_id['start_position']
         image = loadImage(map_id['ground'])
         for _object in map_id['objects']:
+            loaded_object = loadObject(_object)
             if _object['type'] == 'Actor':
-                self.__actors.add(loadObject(_object))
+                self.__actors.append(loaded_object)
             elif _object['type'] == 'Object':
-                self.__objects.add(loadObject(_object))
-                
+                self.__objects.append(loaded_object)
+            self.__draw.add(loaded_object)
         return [start_position, image]
                 
     def cleanCurrentMap(self):
@@ -131,7 +130,6 @@ def loadObject(object_data):
             file_data['collision_rect'])
     
     elif object_data['type'] == 'Actor':
-        print file_data['collision_rect']
         for direction in file_data['animation']:
             animations[direction] = []
             for image_string in file_data['animation'][direction]:

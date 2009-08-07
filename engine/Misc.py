@@ -95,10 +95,11 @@ def zOrder(*groups):
     while True:
         if len(unordered) == 0: return ordered
         for sprite in unordered:
-            if sprite.rect.y == counter:
+            if sprite.rect.y + sprite.rect.height == counter:
                 ordered.add(sprite)
                 unordered.remove(sprite)
         counter += 1
+    return ordered
         
 def getDistance(point_a, point_b):
     """

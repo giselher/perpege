@@ -54,7 +54,6 @@ def main():
     
     menu.store_action('new_game', new_game)
     menu.store_action('quit', quit)
-
     _post = pygame.event.post
     while True:
         screen.fill((0, 0, 0))
