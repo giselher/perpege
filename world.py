@@ -2,8 +2,9 @@ from actor import Actor, Player
 from reader import Reader
 from engine.Decorator import Cache
 from engine.Object import MovableObject
-from engine.Misc import loadImage, getImagePath, zOrder
+from engine.Misc import *
 from engine import Input
+from gui.dialog import Dialog
 import pygame
 from pygame.locals import *
 import gzip, os.path, pickle
@@ -15,7 +16,10 @@ class World(object):
         self.display = display_surface
         self.display_rect = self.display.get_rect()
         self.display_center = self.display_rect.center
+        self.dialog = Dialog(self.display)
         self.input = Input.I2d2axis()
+        
+        self.itf = False
         
         self.step = 10
         
@@ -81,6 +85,28 @@ class World(object):
             if event.type == KEYDOWN:
                 if event.key == K_ESCAPE:
                     self.state.change('menu')
+                elif event.key == K_a: self.action()
+                elif event.key == K_TAB:
+                    if self.itf: self.itf = False
+                    else: self.itf = True
+                    
+    def action(self):
+        max_dist = 100
+        nearest = None
+        _player_center = self.player.rect.center
+        self.MainGroup.remove(self.player)
+        for sprite in self.MainGroup.sprites():
+            _dist = getDistance(_player_center, sprite.rect.center)
+            if _dist < max_dist:
+                nearest = sprite
+                max_dsit = _dist
+         
+        if nearest is not None:
+            if nearest in self.Actors: 
+                self.player.facing(nearest)
+                nearest.facing(self.player)
+                
+        self.MainGroup.add(self.player)
                     
     def move(self):
         direction = self.input(self.step)
@@ -105,11 +131,15 @@ class World(object):
             
     def loop(self):
         self.key_loop()
-        self.move()
-        for sprite in self.Actors:
-            sprite.loop(self)
-        self.player.loop()
-        self.draw()
+        if self.itf:
+            self.draw()
+            self.dialog.draw()
+        else:
+            self.move()
+            for sprite in self.Actors:
+                sprite.loop(self)
+            self.player.loop()
+            self.draw()
         
 class MapMaker(object):
     
@@ -160,7 +190,7 @@ def loadActor(data, reader):
         for image_string in file_data['animation'][direction]:
             animations[direction].append(_fromstring(image_string, \
                     file_data['size'], file_data['format']))
-    print actor_data
+
     return Actor(animations, data['pos'], file_data['collision_rect'], actor_data)
 
 def loadPlayer(file):

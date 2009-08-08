@@ -25,6 +25,30 @@ class Actor(MovableObject, SAS):
         self.i_step = 0
         self.prev_dir = 'none' 
         
+    def facing(self, target):
+        if target.crect.center[0] < self.crect.center[0]:
+            if target.crect.center[1] < self.crect.center[1]:
+                if (self.crect.center[0] - target.crect.center[0]) < (self.crect.center[1] - target.crect.center[1]):
+                    self.image = self.animations['up'][3]
+                else:
+                    self.image = self.animations['left'][3]
+            else:
+                if (self.crect.center[0] - target.crect.center[0]) < (target.crect.center[1] - self.crect.center[1]):
+                    self.image = self.animations['down'][3]
+                else:
+                    self.image = self.animations['left'][3]
+        else:
+            if target.crect.center[1] < self.crect.center[1]:
+                if (target.crect.center[0] - self.crect.center[0]) < (self.crect.center[1] - target.crect.center[1]):
+                    self.image = self.animations['up'][3]
+                else:
+                    self.image = self.animations['right'][3]
+            else:
+                if (target.crect.center[0] - self.crect.center[0]) < (target.crect.center[1] - self.crect.center[1]):
+                    self.image = self.animations['down'][3]
+                else:
+                    self.image = self.animations['right'][3]
+        
     def move(self, coord):
         crect = self.crect.move(coord)
         return {'new_crect' : crect, 'old_crect' : self.crect}

@@ -7,6 +7,7 @@ from engine.Misc import loadImage
 from world import World
 from gui.menu import MainMenu
 from gui.debug import blit_fps
+from gui.dialog import Dialog
 
 class StateHandler(object):
     
@@ -62,6 +63,7 @@ def main():
             if event.type == QUIT: quit()
             elif event.type == KEYDOWN:
                 if event.key == K_q: quit()
+                elif event.key == K_F11: pygame.display.toggle_fullscreen()
                 else:
                     _post(event)
             else:
@@ -69,7 +71,7 @@ def main():
             
         _state = State.state
         if _state == 'game':
-            world.loop()
+            world.loop()         
         elif _state == 'menu':
             menu.draw(screen)
 

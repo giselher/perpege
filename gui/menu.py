@@ -1,11 +1,10 @@
 
-import pygame
-import math, sys
-import gettext
+import pygame, math, gettext
 from pygame.locals import *
+from __init__ import loadImage
+
 _ = gettext.gettext
-sys.path.append('../')
-import engine
+
 
 class MenuButton(pygame.sprite.Sprite):
     
@@ -40,13 +39,12 @@ class MenuButton(pygame.sprite.Sprite):
     def store_action(self, function):
         self.function = function
 
-class MainMenu(pygame.sprite.Sprite):
+class MainMenu(object):
     
     def __init__(self, state_handler, bg_image_path=None):
-        pygame.sprite.Sprite.__init__(self)
         self.state = state_handler
         self.__group = pygame.sprite.Group()
-        self.loadImage = engine.Misc.loadImage
+        self.loadImage = loadImage
         
         self.sel_button = 0
 
