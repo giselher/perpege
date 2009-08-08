@@ -22,13 +22,11 @@ class World(object):
         self.ground = None
         self.image = None
         self.rect = None
-        self.rel_x = None
-        self.rel_y = None
         
         self.player = loadObject({'type': 'Player', 'pos' : (0, 0) , \
             'file' : 'ani/Yves.ani.gz'})
         
-        self.Actors = [self.player]
+        self.Actors = []
         self.Objects = []
         self.MainGroup = pygame.sprite.Group(self.player)
         self.map_maker = MapMaker(self.MainGroup, self.Actors, self.Objects)
@@ -54,21 +52,29 @@ class World(object):
             self.display_rect.height/2 - self.start_position[1])
         self.player.setCenter(self.start_position)
         
-    def check_collision(self, col_dict):
+    def check_collision(self, user, col_dict):
         _new = col_dict['new_crect']
         _old = col_dict['old_crect']
+        self.MainGroup.remove(user)
+        collide = False
         for sprite in self.MainGroup.sprites():
             if _new.colliderect(sprite.crect):
-                return _old
-
-        return _new.clamp(self.ground.get_rect())
+                collide = True
+                
+        self.MainGroup.add(user)
+        if collide:
+            return _old
+        else:
+            return _new.clamp(self.ground.get_rect())
         
     def draw(self):
+        group = zOrder(self.MainGroup)
         self.image.blit(self.ground, (0, 0))
-        zOrder(self.MainGroup).draw(self.image)
-        for sprite in self.MainGroup.sprites():
-            sprite.drawRects(self.image)
+        group.draw(self.image)
+        #for sprite in self.MainGroup.sprites():
+        #    sprite.drawRects(self.image)
         self.display.blit(self.image, self.rect.topleft)
+        group.empty()
 
     def key_loop(self):
         for event in pygame.event.get():
@@ -79,13 +85,11 @@ class World(object):
     def move(self):
         direction = self.input(self.step)
         col_dict = self.player.move(direction)
-        self.MainGroup.remove(self.player)
-        new_crect = self.check_collision(col_dict)
-        self.rect.x -= new_crect.x - col_dict['old_crect'].x
-        self.rect.y -= new_crect.y - col_dict['old_crect'].y
-        self.player.crect = new_crect
-        self.MainGroup.add(self.player)
-        
+
+        self.player.crect = self.check_collision(self.player, col_dict)
+        self.rect.x -= self.player.crect.x - col_dict['old_crect'].x
+        self.rect.y -= self.player.crect.y - col_dict['old_crect'].y
+       
         if direction[0] < 0:
             direction[0] = -1
         elif direction[0] > 0:
@@ -98,14 +102,13 @@ class World(object):
             
         if not (direction[0] == 0 and direction[1] == 0):
             self.player.animate(self.directions[str(direction)])
-        
+            
     def loop(self):
         self.key_loop()
         self.move()
         for sprite in self.Actors:
-            sprite.loop()
-            sprite.clamp(self.ground.get_rect())
-
+            sprite.loop(self)
+        self.player.loop()
         self.draw()
         
 class MapMaker(object):
@@ -116,6 +119,7 @@ class MapMaker(object):
         self.__objects = object_list
 
     def makeMap(self, map_id):
+        print "lolz9"
         start_position = map_id['start_position']
         image = loadImage(map_id['ground'])
         for _object in map_id['objects']:

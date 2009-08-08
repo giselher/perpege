@@ -25,10 +25,8 @@ class Actor(MovableObject, SAS):
         self.prev_dir = 'right' 
         
     def move(self, coord):
-        rect = self.rect.move(coord)
         crect = self.crect.move(coord)
-        return {'new_crect' : crect, 'old_crect' : self.crect,\
-                'new_rect' : rect, 'old_rect' : self.rect}
+        return {'new_crect' : crect, 'old_crect' : self.crect}
         
     def animate(self, direction):
         """
@@ -48,28 +46,22 @@ class Actor(MovableObject, SAS):
             self.image = self.animations[direction][self.i_step]
         except IndexError:
             self.i_step = 0
-    
-    def clamp(self, rect):
-        self.crect.clamp_ip(rect)
-        self.rect.topleft = (self.crect.x-self.diff_x, self.crect.y-self.diff_y)
-        
-    def loop(self):
+            
+    def loop(self, world):
         _choice = self.prev_dir
         self.animate(_choice) 
         direction = self.directions[_choice]
         direction = [direction[0]*self.step, direction[1]*self.step]
-        self.rect.move_ip(direction)
-        self.crect.move_ip(direction)
-        
+        self.crect = world.check_collision(self, self.move(direction))
+    
+        self.rect.topleft = (self.crect.x-self.diff_x, self.crect.y-self.diff_y)
+
         
 class Player(Actor):
     
     def __init__(self, animations, position, col_rect, sas=None):
         Actor.__init__(self, animations, position, col_rect)
-    
-    def clamp(self, surface):
-        pass
-        
+
     def setCenter(self, coord):
         self.rect.center = coord
         self.crect.topleft = (self.rect.x+self.diff_x, self.rect.y+self.diff_y)
