@@ -1,15 +1,25 @@
 from engine.Object import MovableObject
+from reader import Reader
 import pygame
-
 import random
+
+READER = Reader('content/story/dialogs/')
 
 class SAS:
     pass
 
 class Actor(MovableObject, SAS):
 
-    def __init__(self, animations, position, col_rect, sas=None, ta=None):
+    def __init__(self, animations, position, col_rect, actor_data=None):
         MovableObject.__init__(self, animations['down'][3], position, col_rect)
+        
+        if actor_data is not None:
+            self.dialogs = {}
+            for dialog in actor_data['dialogs']:
+                _dlg = READER.readFile(dialog.strip())
+                self.dialogs[dialog.strip()] = _dlg
+                if dialog == actor_data['default_dialog']: self.dialog = _dlg
+
         
         self.diff_x = self.crect.x - self.rect.x
         self.diff_y = self.crect.y - self.rect.y    
@@ -20,31 +30,37 @@ class Actor(MovableObject, SAS):
                             'left' : [-1, 0],
                             'right' : [1, 0],
                             'none' : [0, 0]}
+       #temporarly
         self.step = 5 
         self.a_step = 0
         self.i_step = 0
         self.prev_dir = 'none' 
+               
         
     def facing(self, target):
         if target.crect.center[0] < self.crect.center[0]:
             if target.crect.center[1] < self.crect.center[1]:
-                if (self.crect.center[0] - target.crect.center[0]) < (self.crect.center[1] - target.crect.center[1]):
+                if (self.crect.center[0] - target.crect.center[0]) < \
+                        (self.crect.center[1] - target.crect.center[1]):
                     self.image = self.animations['up'][3]
                 else:
                     self.image = self.animations['left'][3]
             else:
-                if (self.crect.center[0] - target.crect.center[0]) < (target.crect.center[1] - self.crect.center[1]):
+                if (self.crect.center[0] - target.crect.center[0]) < \
+                        (target.crect.center[1] - self.crect.center[1]):
                     self.image = self.animations['down'][3]
                 else:
                     self.image = self.animations['left'][3]
         else:
             if target.crect.center[1] < self.crect.center[1]:
-                if (target.crect.center[0] - self.crect.center[0]) < (self.crect.center[1] - target.crect.center[1]):
+                if (target.crect.center[0] - self.crect.center[0]) < \
+                        (self.crect.center[1] - target.crect.center[1]):
                     self.image = self.animations['up'][3]
                 else:
                     self.image = self.animations['right'][3]
             else:
-                if (target.crect.center[0] - self.crect.center[0]) < (target.crect.center[1] - self.crect.center[1]):
+                if (target.crect.center[0] - self.crect.center[0]) < \
+                        (target.crect.center[1] - self.crect.center[1]):
                     self.image = self.animations['down'][3]
                 else:
                     self.image = self.animations['right'][3]
@@ -84,7 +100,7 @@ class Actor(MovableObject, SAS):
         
 class Player(Actor):
     
-    def __init__(self, animations, position, col_rect, sas=None):
+    def __init__(self, animations, position, col_rect):
         Actor.__init__(self, animations, position, col_rect)
 
     def setCenter(self, coord):
