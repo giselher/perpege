@@ -24,11 +24,17 @@ class Actor(MovableObject, SAS):
         self.i_step = 0
         self.prev_dir = 'right' 
         
-    def collision_prediction(self):
-        pass
+    def move(self, coord):
+        rect = self.rect.move(coord)
+        crect = self.crect.move(coord)
+        return {'new_crect' : crect, 'old_crect' : self.crect,\
+                'new_rect' : rect, 'old_rect' : self.rect}
         
-    def animate(self, dir):
-        if dir == self.prev_dir:
+    def animate(self, direction):
+        """
+        up, down, left, right, ...
+        """
+        if direction == self.prev_dir:
             if self.a_step == 1:
                 self.i_step += 1
                 self.a_step = 0
@@ -37,9 +43,9 @@ class Actor(MovableObject, SAS):
         else:
             self.a_step = 0
             self.i_step = 0
-            self.prev_dir = dir
+            self.prev_dir = direction
         try:
-            self.image = self.animations[dir][self.i_step]
+            self.image = self.animations[direction][self.i_step]
         except IndexError:
             self.i_step = 0
     
@@ -60,10 +66,14 @@ class Player(Actor):
     
     def __init__(self, animations, position, col_rect, sas=None):
         Actor.__init__(self, animations, position, col_rect)
+    
+    def clamp(self, surface):
+        pass
         
     def setCenter(self, coord):
         self.rect.center = coord
         self.crect.topleft = (self.rect.x+self.diff_x, self.rect.y+self.diff_y)
 
     def loop(self):
-        pass
+        self.rect.topleft = (self.crect.x-self.diff_x, self.crect.y-self.diff_y)
+

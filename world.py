@@ -15,25 +15,27 @@ class World(object):
         self.display = display_surface
         self.display_rect = self.display.get_rect()
         self.display_center = self.display_rect.center
-        self.input = Input.I2d4axis()
+        self.input = Input.I2d2axis()
         
         self.step = 10
         
         self.ground = None
         self.image = None
         self.rect = None
+        self.rel_x = None
+        self.rel_y = None
         
-        self.player = loadObject({'type': 'Player', 'pos' : (self.display_rect.width/2, \
-            self.display_rect.height/2) ,'file' : 'ani/Dummy.ani.gz'})
+        self.player = loadObject({'type': 'Player', 'pos' : (0, 0) , \
+            'file' : 'ani/Yves.ani.gz'})
         
         self.Actors = [self.player]
         self.Objects = []
-        self.DrawGroup = pygame.sprite.Group(self.player)
-        self.map_maker = MapMaker(self.DrawGroup, self.Actors, self.Objects)
+        self.MainGroup = pygame.sprite.Group(self.player)
+        self.map_maker = MapMaker(self.MainGroup, self.Actors, self.Objects)
         self.map_reader = Reader('content/maps/')
         
         self.start_position, image = self.map_maker.makeMap(self.map_reader.readFile('01_test.map'))
-        self.setImage(image)
+        self.Map_init(image)
         
         self.directions = { '[0, -1]' :  'up',
                             '[0, 1]' : 'down',
@@ -44,18 +46,27 @@ class World(object):
                             '[1, -1]' : 'upright',
                             '[-1, -1]' : 'upleft'}
 
-    def setImage(self, surface):
+    def Map_init(self, surface):
         self.ground = surface
         self.rect = surface.get_rect()
         self.image = pygame.Surface(self.rect.size)
         self.rect.topleft = (self.display_rect.width/2-self.start_position[0],\
             self.display_rect.height/2 - self.start_position[1])
-        self.player.setPosition(self.start_position)
+        self.player.setCenter(self.start_position)
+        
+    def check_collision(self, col_dict):
+        _new = col_dict['new_crect']
+        _old = col_dict['old_crect']
+        for sprite in self.MainGroup.sprites():
+            if _new.colliderect(sprite.crect):
+                return _old
+
+        return _new.clamp(self.ground.get_rect())
         
     def draw(self):
         self.image.blit(self.ground, (0, 0))
-        zOrder(self.DrawGroup).draw(self.image)
-        for sprite in self.DrawGroup.sprites():
+        zOrder(self.MainGroup).draw(self.image)
+        for sprite in self.MainGroup.sprites():
             sprite.drawRects(self.image)
         self.display.blit(self.image, self.rect.topleft)
 
@@ -66,24 +77,28 @@ class World(object):
                     self.state.change('menu')
                     
     def move(self):
-        direction = self.input(-self.step)
-        _direction = [direction[0]*-1,direction[1]*-1]
-        self.player.move(_direction)
-        self.player.clamp(self.ground.get_rect())
-        self.rect.move_ip(direction)
+        direction = self.input(self.step)
+        col_dict = self.player.move(direction)
+        self.MainGroup.remove(self.player)
+        new_crect = self.check_collision(col_dict)
+        self.rect.x -= new_crect.x - col_dict['old_crect'].x
+        self.rect.y -= new_crect.y - col_dict['old_crect'].y
+        self.player.crect = new_crect
+        self.MainGroup.add(self.player)
+        
         if direction[0] < 0:
-            direction[0] = 1
-        elif direction[0] > 0:
             direction[0] = -1
+        elif direction[0] > 0:
+            direction[0] = 1
             
         if direction[1] < 0:
-            direction[1] = 1
-        elif direction[1] > 0:
             direction[1] = -1
+        elif direction[1] > 0:
+            direction[1] = 1
             
         if not (direction[0] == 0 and direction[1] == 0):
             self.player.animate(self.directions[str(direction)])
-                    
+        
     def loop(self):
         self.key_loop()
         self.move()
