@@ -1,0 +1,7 @@
+
+player="Who are you?"
+self="My name is Duster, nice to meet you. Who are you?"
+player="I am Yves"
+
+#gives the player a new event
+put E_0001

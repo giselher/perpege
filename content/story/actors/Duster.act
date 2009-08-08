@@ -1,0 +1,9 @@
+name=Duster
+imageset=Duster.ani.gz
+dialogs=duster_event_test.dlg, duster_intro.dlg
+default_dialog=duster_intro.dlg
+
+dailly_routine=stand.ta.py
+
+# inventory
+# misc

@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-import os, sys, atexit
+import os, sys
 import pygame
 from pygame.locals import *
 import settings

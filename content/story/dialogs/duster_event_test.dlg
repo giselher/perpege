@@ -1,0 +1,15 @@
+# events that are needed for this
+E_0001
+
+self="Hi Yves, how do you do?"
+player="Hi Duster. Well, not realy good. The game sucks"
+self="Why?"
+# 'choices' marks choices then the choice number and a summary for the text the number is a link
+choice=1:"The code sucks.", 2:"The graphics sucks.", end:"Nevermind."
+1:player="Because, the code sucks."
+1:self="Okay, i will talk with Giselher."
+2:player="Because, the graphics are ugly."
+2:self="I will talk to James."
+
+
+

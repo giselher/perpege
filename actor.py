@@ -9,7 +9,7 @@ class SAS:
 class Actor(MovableObject, SAS):
 
     def __init__(self, animations, position, col_rect, sas=None, ta=None):
-        MovableObject.__init__(self, animations['down'][0], position, col_rect)
+        MovableObject.__init__(self, animations['down'][3], position, col_rect)
         
         self.diff_x = self.crect.x - self.rect.x
         self.diff_y = self.crect.y - self.rect.y    
@@ -18,11 +18,12 @@ class Actor(MovableObject, SAS):
         self.directions = { 'up' : [0, -1],
                             'down' : [0, 1],
                             'left' : [-1, 0],
-                            'right' : [1, 0]}
+                            'right' : [1, 0],
+                            'none' : [0, 0]}
         self.step = 5 
         self.a_step = 0
         self.i_step = 0
-        self.prev_dir = 'right' 
+        self.prev_dir = 'none' 
         
     def move(self, coord):
         crect = self.crect.move(coord)
@@ -49,7 +50,7 @@ class Actor(MovableObject, SAS):
             
     def loop(self, world):
         _choice = self.prev_dir
-        self.animate(_choice) 
+        #self.animate(_choice) 
         direction = self.directions[_choice]
         direction = [direction[0]*self.step, direction[1]*self.step]
         self.crect = world.check_collision(self, self.move(direction))

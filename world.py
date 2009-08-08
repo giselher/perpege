@@ -23,8 +23,7 @@ class World(object):
         self.image = None
         self.rect = None
         
-        self.player = loadObject({'type': 'Player', 'pos' : (0, 0) , \
-            'file' : 'ani/Yves.ani.gz'})
+        self.player = loadPlayer('Yves.ani.gz')
         
         self.Actors = []
         self.Objects = []
@@ -75,6 +74,7 @@ class World(object):
         #    sprite.drawRects(self.image)
         self.display.blit(self.image, self.rect.topleft)
         group.empty()
+        del group
 
     def key_loop(self):
         for event in pygame.event.get():
@@ -100,7 +100,7 @@ class World(object):
         elif direction[1] > 0:
             direction[1] = 1
             
-        if not (direction[0] == 0 and direction[1] == 0):
+        if direction[0] != 0 or direction[1] != 0:
             self.player.animate(self.directions[str(direction)])
             
     def loop(self):
@@ -117,53 +117,61 @@ class MapMaker(object):
         self.__draw = draw_group
         self.__actors = actor_list
         self.__objects = object_list
+        self.act_reader = Reader('content/story/actors/')
 
     def makeMap(self, map_id):
-        print "lolz9"
         start_position = map_id['start_position']
         image = loadImage(map_id['ground'])
         for _object in map_id['objects']:
             loaded_object = loadObject(_object)
-            if _object['type'] == 'Actor':
-                self.__actors.append(loaded_object)
-            elif _object['type'] == 'Object':
-                self.__objects.append(loaded_object)
+            self.__objects.append(loaded_object)
             self.__draw.add(loaded_object)
+        for _actor in map_id['actors']:
+            loaded_object = loadActor(_actor, self.act_reader)
+            self.__actors.append(loaded_object)
+            self.__draw.add(loaded_object)  
+                      
         return [start_position, image]
                 
     def cleanCurrentMap(self):
         pass
 
-@Cache()        
+@Cache()
 def loadObject(object_data):
-    _fromstring = pygame.image.fromstring
-    img_file = gzip.open(os.path.join(getImagePath(), \
+    img_file = gzip.open(os.path.join('content/img/', \
         object_data['file']), 'rb', 1)
     file_data = pickle.load(img_file)
     img_file.close()
+    image = pygame.image.fromstring(file_data['image_string'], \
+        file_data['size'], file_data['format'])
+    return MovableObject(image, object_data['pos'], file_data['collision_rect'])
+    
+@Cache()
+def loadActor(data, reader):
+    actor_data = reader.readFile(data['file'])
+    _fromstring = pygame.image.fromstring
+    img_file = gzip.open(os.path.join('content/ani/', \
+        actor_data['imageset']), 'rb', 1)
+    file_data = pickle.load(img_file)
+    img_file.close()
     animations = {}
-    if object_data['type'] == 'Object': 
-        image = _fromstring(file_data['image_string'], \
-            file_data['size'], file_data['format'])
-        game_object = MovableObject(image, object_data['pos'], \
-            file_data['collision_rect'])
-    
-    elif object_data['type'] == 'Actor':
-        for direction in file_data['animation']:
-            animations[direction] = []
-            for image_string in file_data['animation'][direction]:
-                animations[direction].append(_fromstring(image_string, \
-                        file_data['size'], file_data['format']))
-        game_object = Actor(animations, object_data['pos'], \
-            file_data['collision_rect'])
-            
-    elif object_data['type'] == 'Player':
-        for direction in file_data['animation']:
-            animations[direction] = []
-            for image_string in file_data['animation'][direction]:
-                animations[direction].append(_fromstring(image_string, \
-                        file_data['size'], file_data['format']))
-        game_object = Player(animations, object_data['pos'], \
-            file_data['collision_rect'])
-    
-    return game_object
+    for direction in file_data['animation']:
+        animations[direction] = []
+        for image_string in file_data['animation'][direction]:
+            animations[direction].append(_fromstring(image_string, \
+                    file_data['size'], file_data['format']))
+    print actor_data
+    return Actor(animations, data['pos'], file_data['collision_rect'], actor_data)
+
+def loadPlayer(file):
+    _fromstring = pygame.image.fromstring
+    img_file = gzip.open(os.path.join('content/ani/', file), 'rb', 1)
+    file_data = pickle.load(img_file)
+    img_file.close()
+    animations = {}
+    for direction in file_data['animation']:
+        animations[direction] = []
+        for image_string in file_data['animation'][direction]:
+            animations[direction].append(_fromstring(image_string, \
+                    file_data['size'], file_data['format']))
+    return Player(animations, (0, 0), file_data['collision_rect'])
