@@ -10,16 +10,21 @@ class SAS:
 
 class Actor(MovableObject, SAS):
 
-    def __init__(self, animations, position, col_rect, actor_data=None):
+    def __init__(self, portrait, animations, position, col_rect, actor_data=None):
         MovableObject.__init__(self, animations['down'][3], position, col_rect)
         
+        self.portrait = portrait
+        
         if actor_data is not None:
+            self.name = actor_data['name']
             self.dialogs = {}
             for dialog in actor_data['dialogs']:
-                _dlg = READER.readFile(dialog.strip())
-                self.dialogs[dialog.strip()] = _dlg
-                if dialog == actor_data['default_dialog']: self.dialog = _dlg
-
+                _dialog = dialog.strip()
+                _dlg = READER.readFile(_dialog)
+                self.dialogs[_dialog] = _dlg
+                if _dialog == actor_data['default_dialog']: self.dialog = _dialog
+        
+        self.id = actor_data
         
         self.diff_x = self.crect.x - self.rect.x
         self.diff_y = self.crect.y - self.rect.y    
@@ -35,7 +40,9 @@ class Actor(MovableObject, SAS):
         self.a_step = 0
         self.i_step = 0
         self.prev_dir = 'none' 
-               
+        
+    def action(self, target):
+        pass
         
     def facing(self, target):
         if target.crect.center[0] < self.crect.center[0]:
@@ -100,8 +107,13 @@ class Actor(MovableObject, SAS):
         
 class Player(Actor):
     
-    def __init__(self, animations, position, col_rect):
-        Actor.__init__(self, animations, position, col_rect)
+    def __init__(self, portrait, animations, position, col_rect):
+        Actor.__init__(self, portrait, animations, position, col_rect)
+        
+        self.name = "Yves"
+        
+        self.events = []
+        self.quest_events = {}
 
     def setCenter(self, coord):
         self.rect.center = coord

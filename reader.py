@@ -130,6 +130,7 @@ class Reader(object):
                 content["%d-%s" % (counter, line_data[0])] = choice
             elif line.startswith('self') or line.startswith('player'):
                 line_data = line.split('=')
+                if not line_data[1].startswith('"'): raise SyntaxError('No Text')
                 content['%d-%s' % (counter, line_data[0])] = line_data[1]
             elif line.startswith('set'):
                 line_data = line.split(' ')

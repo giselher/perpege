@@ -4,10 +4,11 @@ from engine.Decorator import Cache
 from engine.Object import MovableObject
 from engine.Misc import *
 from engine import Input
-from gui.dialog import Dialog
+from gui import Interface
 import pygame
 from pygame.locals import *
 import gzip, os.path, pickle
+import handler
 
 class World(object):
     
@@ -16,7 +17,8 @@ class World(object):
         self.display = display_surface
         self.display_rect = self.display.get_rect()
         self.display_center = self.display_rect.center
-        self.dialog = Dialog(self.display)
+        self.interface = Interface(self, self.display)
+        
         self.input = Input.I2d2axis()
         
         self.itf = False
@@ -28,6 +30,8 @@ class World(object):
         self.rect = None
         
         self.player = loadPlayer('Yves.ani.gz')
+        
+        self.deq_handler = handler.DEQ_Handler(self.player)
         
         self.Actors = []
         self.Objects = []
@@ -86,9 +90,6 @@ class World(object):
                 if event.key == K_ESCAPE:
                     self.state.change('menu')
                 elif event.key == K_a: self.action()
-                elif event.key == K_TAB:
-                    if self.itf: self.itf = False
-                    else: self.itf = True
                     
     def action(self):
         max_dist = 100
@@ -105,6 +106,8 @@ class World(object):
             if nearest in self.Actors: 
                 self.player.facing(nearest)
                 nearest.facing(self.player)
+                self.interface.showDialog(nearest, self.player, self.deq_handler)
+                self.itf = True
                 
         self.MainGroup.add(self.player)
                     
@@ -130,11 +133,12 @@ class World(object):
             self.player.animate(self.directions[str(direction)])
             
     def loop(self):
-        self.key_loop()
         if self.itf:
+            self.interface.key_loop()
             self.draw()
-            self.dialog.draw()
+            self.interface.draw()
         else:
+            self.key_loop()
             self.move()
             for sprite in self.Actors:
                 sprite.loop(self)
@@ -190,8 +194,8 @@ def loadActor(data, reader):
         for image_string in file_data['animation'][direction]:
             animations[direction].append(_fromstring(image_string, \
                     file_data['size'], file_data['format']))
-
-    return Actor(animations, data['pos'], file_data['collision_rect'], actor_data)
+    portrait = _fromstring(file_data['portrait'], (100, 100), file_data['format'])
+    return Actor(portrait, animations, data['pos'], file_data['collision_rect'], actor_data)
 
 def loadPlayer(file):
     _fromstring = pygame.image.fromstring
@@ -204,4 +208,5 @@ def loadPlayer(file):
         for image_string in file_data['animation'][direction]:
             animations[direction].append(_fromstring(image_string, \
                     file_data['size'], file_data['format']))
-    return Player(animations, (0, 0), file_data['collision_rect'])
+    portrait = _fromstring(file_data['portrait'], (100, 100), file_data['format'])
+    return Player(portrait, animations, (0, 0), file_data['collision_rect'])
