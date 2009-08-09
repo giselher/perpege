@@ -33,6 +33,7 @@ class Dialog(object):
                 if len(_dialogs[_dialog]['requirements']) > len(dialog['requirements']):
                     dialog = _dialog
         
+        self.counter = 0
         self.content = dialog['content']
         self.owner = owner
         self.player = player
@@ -47,9 +48,12 @@ class Dialog(object):
         _str_count = str(self.counter)
         for line in self.content:
             if line.startswith(_str_count):
-                _lined = line.split('-')
-                _line1 = _lined[1]
+                _line1 = line.split('-')[1]
                 text = self.content[line]
+                if _line1 == 'set': 
+                    self.handler.set(text)
+                    _line1 = None
+                    self.counter += 1
 
         if _line1 is not None:
             self.counter += 1
@@ -60,13 +64,11 @@ class Dialog(object):
                 self.name = self.render(self.owner.name)
                 self.portrait = self.owner.portrait
             
-            if _line1 == 'set':
-                self.handler.set(text)
-            else:
-                self.text = []
-                text = textwrap.wrap(eval(text), 29)
-                for line in text:
-                    self.text.append(self.render(line))
+
+            self.text = []
+            text = textwrap.wrap(eval(text), 29)
+            for line in text:
+                self.text.append(self.render(line))
             return True
         else:
             return False
