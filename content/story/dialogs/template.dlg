@@ -27,25 +27,25 @@ self="An Answer"
 
 choice=1:"Summary 1"; 2:"Summary 2"; 3:"Summary 3"
 
-:1:player="Full Text 1"
-:1:self="Answer 1"
-:1:end # go to the end of 1 and then to the end of the dialog
+1:player="Full Text 1"
+1:self="Answer 1"
+ 
+# go to the end of 1 and then to the end of the dialog
 
-:3:player="Lets fight"
-:3:fight
+2:choice=1:"Summary 1"; 2:"Summary 2"
+2:1:player="Full Text 2 1"
+2:1:self="Answer 2 1"
+2:1:set item <item>
+2:2:player="Lets trade"
+2:2:trade
+2:2:self="You're Welcome"
 
-:2:choice=1:"Summary 1"; 2:"Summary 2"
-:2:1:player="Full Text 2 1"
-:2:1:self="Answer 2 1"
-:2:1:set item <item>
-:2:2:player="Lets trade"
-:2:2:trade
-:2:2:self="You're Welcome"
+3:player="Lets fight"
+3:fight
 
 self="I hate choices."
 player="I know."
-
-end:self="See ya"
+self="See ya"
 
 set E_0000
 set EQ_0000
