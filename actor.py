@@ -22,7 +22,6 @@ class Actor(MovableObject, SAS):
                 _dialog = dialog.strip()
                 _dlg = READER.readFile(_dialog)
                 self.dialogs[_dialog] = _dlg
-                if _dialog == actor_data['default_dialog']: self.dialog = _dialog
         
         self.id = actor_data
         

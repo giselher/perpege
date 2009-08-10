@@ -12,22 +12,23 @@ import handler
 
 class World(object):
     
-    def __init__(self, display_surface, state_handler):
-        self.state = state_handler
+    def __init__(self, display_surface):
         self.display = display_surface
         self.display_rect = self.display.get_rect()
         self.display_center = self.display_rect.center
+        
+        self.itf = True
         self.interface = Interface(self, self.display)
+        self.interface.menu.store_action('new_game', self.new_game)
+        self.interface.showMenu('start')
         
         self.input = Input.I2d2axis()
         
-        self.itf = False
-        
         self.step = 10
         
-        self.ground = None
-        self.image = None
-        self.rect = None
+        self.image = pygame.Surface((0, 0))
+        self.ground = pygame.Surface((0, 0))
+        self.rect = self.image.get_rect()
         
         self.player = loadPlayer('Yves.ani.gz')
         
@@ -39,9 +40,6 @@ class World(object):
         self.map_maker = MapMaker(self.MainGroup, self.Actors, self.Objects)
         self.map_reader = Reader('content/maps/')
         
-        self.start_position, image = self.map_maker.makeMap(self.map_reader.readFile('01_test.map'))
-        self.Map_init(image)
-        
         self.directions = { '[0, -1]' :  'up',
                             '[0, 1]' : 'down',
                             '[-1, 0]' : 'left',
@@ -50,6 +48,15 @@ class World(object):
                             '[-1, 1]' : 'downleft',
                             '[1, -1]' : 'upright',
                             '[-1, -1]' : 'upleft'}
+                            
+    def new_game(self):
+        self.start_position, image = self.map_maker.makeMap(self.map_reader.readFile('01_test.map'))
+        self.Map_init(image)
+           
+        self.player.events = []
+        self.player.quest_events = {}
+                
+        self.itf = False
 
     def Map_init(self, surface):
         self.ground = surface
@@ -87,8 +94,7 @@ class World(object):
     def key_loop(self):
         for event in pygame.event.get():
             if event.type == KEYDOWN:
-                if event.key == K_ESCAPE:
-                    self.state.change('menu')
+                if event.key == K_ESCAPE: self.interface.showMenu()
                 elif event.key == K_a: self.action()
                     
     def action(self):
@@ -107,7 +113,6 @@ class World(object):
                 self.player.facing(nearest)
                 nearest.facing(self.player)
                 self.interface.showDialog(nearest, self.player, self.deq_handler)
-                self.itf = True
                 
         self.MainGroup.add(self.player)
                     
@@ -134,7 +139,6 @@ class World(object):
             
     def loop(self):
         if self.itf:
-            self.interface.key_loop()
             self.draw()
             self.interface.draw()
         else:

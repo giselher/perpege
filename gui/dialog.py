@@ -1,4 +1,5 @@
 import textwrap
+from pygame.locals import *
 
 class Dialog(object):
     
@@ -29,6 +30,11 @@ class Dialog(object):
         self.player = player
         self.handler = handler
         self.next()
+    
+    def key_loop(self, key):
+        if key == K_a: 
+            if not self.next():
+                self.parent.world.itf = False
     
     def render(self, text):
         return self.font.render(text, True, (0, 0, 0))

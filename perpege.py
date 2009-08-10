@@ -5,25 +5,7 @@ from pygame.locals import *
 import settings
 from engine.Misc import loadImage
 from world import World
-from gui.menu import MainMenu
 from gui.debug import blit_fps
-from gui.dialog import Dialog
-
-class StateHandler(object):
-    
-    def __init__(self, state):
-        self.state = state
-        self.previous = None
-        
-    def change(self, state):
-        self.previous = self.state
-        self.state = state
-        
-    def __str__(self):
-        return self.state
-    
-    def _repr__(self):
-        return self.state
 
 def init():
     pygame.init()
@@ -40,21 +22,15 @@ def quit():
     sys.exit(0)
     
 def main():
-    screen = init()
+    screen = init() 
     _display_flip = pygame.display.flip
     screen.blit(loadImage('Load.png'), (0, 0))
     _display_flip()
     clock = pygame.time.Clock()
-    State = StateHandler('menu')
-    
-    def new_game():
-        State.change('game')
-        
-    world = World(screen, State) 
-    menu = MainMenu(State, 'menu.jpg')
-    
-    menu.store_action('new_game', new_game)
-    menu.store_action('quit', quit)
+
+    world = World(screen) 
+
+    world.interface.menu.store_action('quit', quit)
     _post = pygame.event.post
     while True:
         screen.fill((0, 0, 0))
@@ -69,15 +45,12 @@ def main():
             else:
                 _post(event)
             
-        _state = State.state
-        if _state == 'game':
-            world.loop()         
-        elif _state == 'menu':
-            menu.draw(screen)
-
+        world.loop()       
+          
         blit_fps(clock, screen, (10, 10))
-        _display_flip()
         
+        _display_flip()
+
 
 if __name__ == "__main__":
     try:

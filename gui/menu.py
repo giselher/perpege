@@ -1,7 +1,6 @@
 
 import pygame, math, gettext
 from pygame.locals import *
-from __init__ import loadImage
 
 _ = gettext.gettext
 
@@ -41,10 +40,13 @@ class MenuButton(pygame.sprite.Sprite):
 
 class MainMenu(object):
     
-    def __init__(self, state_handler, bg_image_path=None):
-        self.state = state_handler
+    def __init__(self, parent, bg_image_path=None):
+        self.parent = parent
+        from __init__ import loadImage
         self.__group = pygame.sprite.Group()
         self.loadImage = loadImage
+        
+        self.state = ''
         
         self.sel_button = 0
 
@@ -64,6 +66,9 @@ class MainMenu(object):
         
         for button in self.buttons:
             self.__group.add(button)
+            
+    def set_state(self, state):
+        self.state = state
         
     def store_action(self, button_name, function):
         for button in self.buttons:
@@ -71,22 +76,19 @@ class MainMenu(object):
                 button.store_action(function)
 
     def draw(self, surface):
-        self.key_loop()
         surface.blit(self.image, (0, 0))
         self.__group.draw(surface)
         
     def resume(self):
-        if self.state.previous is not None:
-            self.state.change(self.state.previous)
+        self.parent.world.itf = False        
         
-    def key_loop(self):
-        for event in pygame.event.get():
-            if event.type == KEYDOWN:
-                if event.key == K_DOWN: self.key_down()
-                elif event.key == K_UP: self.key_up()
-                elif event.key == K_RETURN: self.key_return()
-                elif event.key == K_ESCAPE: self.resume()
-            
+    def key_loop(self, key):
+        if key == K_DOWN: self.key_down()
+        elif key == K_UP: self.key_up()
+        elif key == K_RETURN: self.key_return()
+        elif key == K_ESCAPE: 
+            if self.state == 'game': self.resume()
+
     def key_down(self):
         self.buttons[self.sel_button].normal()
         if not self.sel_button == 3: self.sel_button += 1
