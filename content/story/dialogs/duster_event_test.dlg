@@ -13,7 +13,7 @@ choice=0:"The code sucks."; 1:"The graphics sucks."; 2:"Nevermind."
 1:self="I will talk to James."
 
 2:player="Nevermind"
-2:self="OkeyDokey"
+2:self="Okey Dokey"
 #2:choice=0:"Wich Way should i go?"; 1:"What was your name?"
 #2:0:self="Left."
 #2:0:player="Thank you."

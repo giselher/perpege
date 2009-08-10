@@ -48,7 +48,7 @@ class Dialog(object):
             if key == K_UP: 
                 if self.selected != 0: self.selected -= 1
             elif key == K_DOWN: 
-                if self.selected != len(self.choices): self.selected += 1
+                if self.selected != (len(self.choices) - 1): self.selected += 1
     
     def render(self, text):
         return self.font.render(text, True, (0, 0, 0))
