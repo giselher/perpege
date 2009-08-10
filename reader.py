@@ -16,7 +16,7 @@ class Reader(object):
         
         self.store = {'link-content': '',
                       'linking': False}
-        self.next_l = False
+        self.linking = False
     
     def readFile(self, filename):
         with open(self.path+filename) as f:
@@ -117,8 +117,11 @@ class Reader(object):
             line = ':'.join(splitted_line)[2:]
             counter = self.__createDlgContent(counter, line, dialog[link], link)
             self.store[_link_counter] = counter + 1
-            counter = self.store['counter']
+            self.linking = True
         except ValueError:
+            if link_name == 'link-content' and self.linking:
+                counter = self.store['counter']
+                self.linking = False
             if line.startswith('choice'):
                 choice = {}
                 line_data = line.split('=')
