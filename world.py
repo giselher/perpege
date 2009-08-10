@@ -123,7 +123,7 @@ class World(object):
         self.player.crect = self.check_collision(self.player, col_dict)
         self.rect.x -= self.player.crect.x - col_dict['old_crect'].x
         self.rect.y -= self.player.crect.y - col_dict['old_crect'].y
-       
+        
         if direction[0] < 0:
             direction[0] = -1
         elif direction[0] > 0:
@@ -138,6 +138,7 @@ class World(object):
             self.player.animate(self.directions[str(direction)])
             
     def loop(self):
+        _ground_rect = self.ground.get_rect()
         if self.itf:
             self.draw()
             self.interface.draw()

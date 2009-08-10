@@ -51,7 +51,7 @@ class MainMenu(object):
         self.sel_button = 0
 
         if bg_image_path is None:
-            self.image = self.loadImage('menu.png')
+            self.image = self.loadImage('menu.jpg')
         else:
             self.image = self.loadImage(bg_image_path)
             

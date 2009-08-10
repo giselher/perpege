@@ -40,6 +40,10 @@ class Actor(MovableObject, SAS):
         self.i_step = 0
         self.prev_dir = 'none' 
         
+    def clamp(self, rect):
+        self.rect.clamp_ip(rect)
+        self.crect.topleft = (self.rect.x+self.diff_x, self.rect.y+self.diff_y)
+        
     def action(self, target):
         pass
         
@@ -96,7 +100,6 @@ class Actor(MovableObject, SAS):
             
     def loop(self, world):
         _choice = self.prev_dir
-        #self.animate(_choice) 
         direction = self.directions[_choice]
         direction = [direction[0]*self.step, direction[1]*self.step]
         self.crect = world.check_collision(self, self.move(direction))
