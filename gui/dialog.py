@@ -11,7 +11,7 @@ class Dialog(object):
         self.rect = self.image.get_rect()
         self.rect.center = (self.display.get_rect().width/2, 600)
         
-        self.font = pygame.font.SysFont('Monospace', 18)
+        self.font = pygame.font.SysFont('Monospace', 16, True)
         
         self.counter = 0
         self.name = None
@@ -23,18 +23,8 @@ class Dialog(object):
         self.text = []
         
     def initDialog(self, owner, player, handler):
-        _dialogs = owner.dialogs
-        available_dialogs = handler.getAvailableDialogs(owner)
-        if len(available_dialogs) == 1:
-            dialog = owner.dialogs[available_dialogs[0]]
-        else:
-            dialog = _dialogs[avaible_dialgos[0]]
-            for _dialog in avaible_dialogs[1:]:
-                if len(_dialogs[_dialog]['requirements']) > len(dialog['requirements']):
-                    dialog = _dialog
-        
         self.counter = 0
-        self.content = dialog['content']
+        self.content = handler.getDialog(owner)['content']
         self.owner = owner
         self.player = player
         self.handler = handler
@@ -66,7 +56,7 @@ class Dialog(object):
             
 
             self.text = []
-            text = textwrap.wrap(eval(text), 29)
+            text = textwrap.wrap(eval(text), 32)
             for line in text:
                 self.text.append(self.render(line))
             return True

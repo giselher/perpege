@@ -4,22 +4,23 @@ if E_0001
 self="Hi Yves, how do you do?"
 player="Hi Duster. Well, not realy good. The game sucks"
 self="Why?"
+player="NOTE: There should be a choice feature but doesn't work now. So please be patient. It will come soon. I hope so :).\nP.S. Translators are welcome."
 # 'choices' marks choices then the choice number and a summary for the text the number is a link
-choice=1:"The code sucks."; 2:"The graphics sucks."; 3:"Nevermind."
-1:player="Because, the code sucks."
-1:self="Okay, i will talk with Giselher."
+#choice=1:"The code sucks."; 2:"The graphics sucks."; 3:"Nevermind."
+#1:player="Because, the code sucks."
+#1:self="Okay, i will talk with Giselher."
 
-2:player="Because, the graphics are ugly."
-2:self="I will talk to James."
+#2:player="Because, the graphics are ugly."
+#2:self="I will talk to James."
 
-3:player="Nevermind"
-3:self="OkeyDokey"
-3:choice=1:"Wich Way should i go?"; 2:"What was your name?"
-3:1:self="Left."
-3:1:player="Thank you."
-3:1:self="You're Welcome."
-3:2:self="My Name is Duster."
-3:2:player="Ohh Yeah."
+#3:player="Nevermind"
+#3:self="OkeyDokey"
+#3:choice=1:"Wich Way should i go?"; 2:"What was your name?"
+#3:1:self="Left."
+#3:1:player="Thank you."
+#3:1:self="You're Welcome."
+#3:2:self="My Name is Duster."
+#3:2:player="Ohh Yeah."
 
 
 
