@@ -22,12 +22,12 @@ class Interface(object):
     def showDialog(self, owner, player, handler):
         self.dialog.initDialog(owner, player, handler)        
         self.state = 'dialog'
-        self.world.itf = True
+        self.world.state = 'itf'
         
     def showMenu(self, state='game'):
         self.menu.set_state(state)
         self.state = 'menu'
-        self.world.itf = True
+        self.world.state = 'itf'
         
     def key_loop(self):
         for event in pygame.event.get():
@@ -41,3 +41,5 @@ class Interface(object):
         elif self.state == 'dialog':
             self.dialog.key_loop(self.key_loop())
             self.dialog.draw()
+        else:
+            self.world.state = 'game'

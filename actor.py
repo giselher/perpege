@@ -40,9 +40,9 @@ class Actor(MovableObject, SAS):
         self.i_step = 0
         self.prev_dir = 'none' 
         
-    def clamp(self, rect):
-        self.rect.clamp_ip(rect)
-        self.crect.topleft = (self.rect.x+self.diff_x, self.rect.y+self.diff_y)
+#    def clamp(self, rect):
+#        self.rect.clamp_ip(rect)
+#        self.crect.topleft = (self.rect.x+self.diff_x, self.rect.y+self.diff_y)
         
     def action(self, target):
         pass
@@ -116,6 +116,18 @@ class Player(Actor):
         
         self.events = []
         self.quest_events = {}
+        
+        self.directions = { '[0, -1]' :  'up',
+                            '[0, 1]' : 'down',
+                            '[-1, 0]' : 'left',
+                            '[1, 0]' : 'right',
+                            '[1, 1]' : 'downright',
+                            '[-1, 1]' : 'downleft',
+                            '[1, -1]' : 'upright',
+                            '[-1, -1]' : 'upleft'}
+                            
+    def animate(self, direction):
+        Actor.animate(self, self.directions[direction])
 
     def setCenter(self, coord):
         self.rect.center = coord

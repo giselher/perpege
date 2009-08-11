@@ -80,7 +80,7 @@ class MainMenu(object):
         self.__group.draw(surface)
         
     def resume(self):
-        self.parent.world.itf = False        
+        self.parent.world.state = 'game'        
         
     def key_loop(self, key):
         if key == K_DOWN: self.key_down()

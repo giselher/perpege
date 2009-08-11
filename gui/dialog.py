@@ -43,7 +43,7 @@ class Dialog(object):
                 self.next()
             else:
                 if not self.next():
-                    self.parent.world.itf = False
+                    self.parent.world.state = 'game'
         if self.boolChoices:
             if key == K_UP: 
                 if self.selected != 0: self.selected -= 1

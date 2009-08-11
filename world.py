@@ -17,7 +17,8 @@ class World(object):
         self.display_rect = self.display.get_rect()
         self.display_center = self.display_rect.center
         
-        self.itf = True
+        self.state = 'ift'
+        
         self.interface = Interface(self, self.display)
         self.interface.menu.store_action('new_game', self.new_game)
         self.interface.showMenu('start')
@@ -40,15 +41,10 @@ class World(object):
         self.map_maker = MapMaker(self.MainGroup, self.Actors, self.Objects)
         self.map_reader = Reader('content/maps/')
         
-        self.directions = { '[0, -1]' :  'up',
-                            '[0, 1]' : 'down',
-                            '[-1, 0]' : 'left',
-                            '[1, 0]' : 'right',
-                            '[1, 1]' : 'downright',
-                            '[-1, 1]' : 'downleft',
-                            '[1, -1]' : 'upright',
-                            '[-1, -1]' : 'upleft'}
-                            
+        self.loops = {  'game' : self.game_loop,
+                        'itf' : self.itf_loop,
+                        'combat': self.combat_loop}
+        
     def new_game(self):
         self.start_position, image = self.map_maker.makeMap(self.map_reader.readFile('01_test.map'))
         self.Map_init(image)
@@ -56,7 +52,7 @@ class World(object):
         self.player.events = []
         self.player.quest_events = {}
                 
-        self.itf = False
+        self.state = 'game'
 
     def Map_init(self, surface):
         self.ground = surface
@@ -135,20 +131,26 @@ class World(object):
             direction[1] = 1
             
         if direction[0] != 0 or direction[1] != 0:
-            self.player.animate(self.directions[str(direction)])
+            self.player.animate(str(direction))
+            
+    def game_loop(self):
+        self.key_loop()
+        self.move()
+        for sprite in self.Actors:
+            sprite.loop(self)
+        self.player.loop()
+        self.draw()
+        
+    def itf_loop(self):
+        self.draw()
+        self.interface.draw()
+        
+    def combat_loop(self):
+        pass
             
     def loop(self):
-        _ground_rect = self.ground.get_rect()
-        if self.itf:
-            self.draw()
-            self.interface.draw()
-        else:
-            self.key_loop()
-            self.move()
-            for sprite in self.Actors:
-                sprite.loop(self)
-            self.player.loop()
-            self.draw()
+        self.loops[self.state]()
+
         
 class MapMaker(object):
     
