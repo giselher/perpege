@@ -5,6 +5,7 @@ from engine.Object import MovableObject
 from engine.Misc import *
 from engine import Input
 from gui import Interface
+from combat import Combat
 import pygame
 from pygame.locals import *
 import gzip, os.path, pickle
@@ -22,6 +23,8 @@ class World(object):
         self.interface = Interface(self, self.display)
         self.interface.menu.store_action('new_game', self.new_game)
         self.interface.showMenu('start')
+        
+        self.combat = Combat(self, self.display, self.interface)
         
         self.input = Input.I2d2axis()
         
@@ -47,20 +50,22 @@ class World(object):
         
     def new_game(self):
         self.start_position, image = self.map_maker.makeMap(self.map_reader.readFile('01_test.map'))
-        self.Map_init(image)
+        self.initMap(image)
            
         self.player.events = []
         self.player.quest_events = {}
                 
         self.state = 'game'
 
-    def Map_init(self, surface):
+    def initMap(self, surface):
         self.ground = surface
         self.rect = surface.get_rect()
         self.image = pygame.Surface(self.rect.size)
         self.rect.topleft = (self.display_rect.width/2-self.start_position[0],\
             self.display_rect.height/2 - self.start_position[1])
         self.player.setCenter(self.start_position)
+        
+        self.combat.initMap(surface)
         
     def check_collision(self, user, col_dict):
         _new = col_dict['new_crect']
@@ -92,6 +97,7 @@ class World(object):
             if event.type == KEYDOWN:
                 if event.key == K_ESCAPE: self.interface.showMenu()
                 elif event.key == K_a: self.action()
+                elif event.key == K_c: self.battle()
                     
     def action(self):
         max_dist = 100
@@ -108,7 +114,9 @@ class World(object):
             if nearest in self.Actors: 
                 self.player.facing(nearest)
                 nearest.facing(self.player)
-                self.interface.showDialog(nearest, self.player, self.deq_handler)
+                self.combat.initFight(self.player, [nearest])
+                self.state = 'combat'
+                #self.interface.showDialog(nearest, self.player, self.deq_handler)
                 
         self.MainGroup.add(self.player)
                     
@@ -146,8 +154,9 @@ class World(object):
         self.interface.draw()
         
     def combat_loop(self):
-        pass
-            
+        self.combat.loop()
+        self.combat.draw()
+        
     def loop(self):
         self.loops[self.state]()
 

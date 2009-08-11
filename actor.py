@@ -2,16 +2,15 @@ from engine.Object import MovableObject
 from reader import Reader
 import pygame
 import random
+from saas import SaAS
 
 READER = Reader('content/story/dialogs/')
 
-class SAS:
-    pass
-
-class Actor(MovableObject, SAS):
+class Actor(MovableObject, SaAS):
 
     def __init__(self, portrait, animations, position, col_rect, actor_data=None):
         MovableObject.__init__(self, animations['down'][3], position, col_rect)
+        SaAS.__init__(self)
         
         self.portrait = portrait
         
