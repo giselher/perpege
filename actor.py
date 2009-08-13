@@ -1,10 +1,7 @@
 from engine.Object import MovableObject
-from reader import Reader
 import pygame
-import random
 from saas import SaAS
 
-READER = Reader('content/story/dialogs/')
 
 class Actor(MovableObject, SaAS):
 
@@ -16,11 +13,7 @@ class Actor(MovableObject, SaAS):
         
         if actor_data is not None:
             self.name = actor_data['name']
-            self.dialogs = {}
-            for dialog in actor_data['dialogs']:
-                _dialog = dialog.strip()
-                _dlg = READER.readFile(_dialog)
-                self.dialogs[_dialog] = _dlg
+            self.dialogs = actor_data['dialogs']
         
         self.id = actor_data
         

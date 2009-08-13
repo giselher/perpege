@@ -74,11 +74,23 @@ class Dialog(object):
         
     def next(self):
         if self.boolChoices:
-            self.store['counter'] = self.counter
-            self.store['content'] = self.content
+            if not self.store.has_key('content'):
+                self.store['links'] = []
+                self.store['counter'] = self.counter
+                self.store['content'] = self.content
+                next_link = 'link-content-%d' % self.choice
+            else:
+                last_link = self.store['last-link']
+                self.store['links'].append(last_link)
+                self.store[last_link+'-'+'content'] = self.content
+                self.store[last_link+'-'+'counter'] = self.counter
+                next_link = last_link + "-%d" % self.choice
             self.counter = 0
-            self.content = self.content['link-content-%d' % self.choice]
+            self.selected = 0
+            self.content = self.content[next_link]
+            self.store['last-link'] = next_link
             self.boolChoices = False
+            
         _line1 = None
         _str_count = str(self.counter)
         for line in self.content:
@@ -89,7 +101,7 @@ class Dialog(object):
                     self.handler.set(text)
                     _line1 = None
                     self.counter += 1
-                    
+        print self.store
         if _line1 is not None:
             self.counter += 1
             if _line1 == 'player':
@@ -113,13 +125,30 @@ class Dialog(object):
             return True
         else:
             if self.store.has_key('content'):
-                self.content = self.store.pop('content')
-                self.counter = self.store.pop('counter')
-                self.selected = 0
-                self.next()
+                if self.store.has_key('last-link'):
+                    _link = self.store.pop('last-link')
+                    self.content = self.store.pop('%s-content' % _link)
+                    self.counter = self.store.pop('%s-counter' % _link)
+                    self.next()
+                    
+                elif self.store.has_key('links'):
+                    if len(self.store['links']) > 0:
+                        _link = self.store['links'].pop(-1)
+                        self.content = self.store.pop('%s-content' % _link)
+                        self.counter = self.store.pop('%s-counter' % _link)
+                        self.next()
+                    else:
+                        self.store.pop('links')
+                        
+                else:
+                    self.content = self.store.pop('content')
+                    self.counter = self.store.pop('counter')
+                    self.next()
                 return True
             else:
                 return False
+            
+
         
     def draw(self): 
         self.surface.blit(self.image, (0, 0))

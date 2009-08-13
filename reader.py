@@ -11,12 +11,12 @@ class Reader(object):
     def __init__(self, main_path):
         self.path = (main_path if main_path[-1] == "/" else main_path+"/")
         self.readers = {'act' : self.__readActFile,
-                        'dlg' : self.__readDlgFile,
                         'map' : self.__readMapFile}
         
-        self.store = {'link-content': '',
-                      'linking': False}
-        self.linking = False
+        self.content = {}
+        self.counter = 0
+        self.store = {}
+        self.boolChoice = False
     
     def readFile(self, filename):
         with open(self.path+filename) as f:
@@ -61,91 +61,3 @@ class Reader(object):
                             data = linedata[1]
                     npcdata[linedata[0]] = data 
         return npcdata
-
-    def __readDlgFile(self, lines):
-        dialog = {  'requirements': {},
-                    'content': {}}      
-        counter = 0
-        for line in lines: 
-            line = line.strip() 
-            if not line.startswith('#') or line != '':
-                if line.startswith('if'):
-                    line_data = line.split(' ')
-                    _line1 = line_data[1]
-                    if _line1.startswith('E_'): 
-                        dialog['requirements'][_line1] = None
-                    elif len(line_data) > 2:
-                        try:
-                            _line2 = int(line_data[2])
-                        except ValueError:
-                            _line2 = line_data[2]
-                        dialog['requirements'][_line1] = _line2
-                    elif _line1.startswith('EQ_'):
-                        dialog['requirements'][_line1] = 'ACCEPTED'
-                else:
-
-                    counter = self.__createDlgContent(counter, line, dialog['content'], 'link-content')
-                    counter += 1
-                    #print _dialog
-                        
-        #dialog.update(self._content_adder.solve(self.__createDlgContent))
-        #print dialog
-        return dialog
-    
-    def __createDlgContent(self, counter, line, dialog, link_name):
-        content = {}
-        splitted_line = line.split(':')
-        try:
-            _line0 = int(splitted_line[0])
-            link = link_name + "-%d" % _line0
-            _link_counter = link + "-counter"
-            if self.store.has_key(link_name):
-                if link != self.store[link_name]: 
-                    self.store['counter'] = counter
-                    counter = 0
-                    self.store[_link_counter] = 0
-                    dialog[link] = {}
-                else:
-                    counter = self.store[_link_counter]
-            else:
-                self.store['counter'] = counter
-                counter = 0
-                self.store[_link_counter] = 0
-                dialog[link] = {}
-                #counter = self.store[_link_counter]
-            self.store[link_name] = link
-            line = ':'.join(splitted_line)[2:]
-            counter = self.__createDlgContent(counter, line, dialog[link], link)
-            self.store[_link_counter] = counter + 1
-            self.linking = True
-        except ValueError:
-            if link_name == 'link-content' and self.linking:
-                counter = self.store['counter']
-                self.linking = False
-            if line.startswith('choice'):
-                choice = {}
-                line_data = line.split('=')
-                links = line_data[1].split(';')
-                for link in links:
-                    link = link.strip()
-                    link_data = link.split(':')
-                    choice[int(link_data[0])] = link_data[1]
-                content["%d-%s" % (counter, line_data[0])] = choice
-            elif line.startswith('self') or line.startswith('player'):
-                line_data = line.split('=')
-                if not line_data[1].startswith('"'): raise SyntaxError('No Text')
-                content['%d-%s' % (counter, line_data[0])] = line_data[1]
-            elif line.startswith('set'):
-                line_data = line.split(' ')
-                _line1 = line_data[1]
-                _set = '%d-set' % counter
-                if _line1.startswith('E_'): 
-                    content[_set] = _line1
-                elif len(line_data) > 2:
-                    content[_set]= _line1 +"=="+ line_data[2]
-                elif _line1.startswith('EQ_'):
-                    content[_set] = '%s==ACCEPTED' % _line1
-            else:
-                counter -= 1
-        dialog.update(content)
-        return counter

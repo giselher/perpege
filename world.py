@@ -115,7 +115,6 @@ class World(object):
                 self.player.facing(nearest)
                 nearest.facing(self.player)
                 self.combat.initFight(self.player, [nearest])
-                self.state = 'combat'
                 #self.interface.showDialog(nearest, self.player, self.deq_handler)
                 
         self.MainGroup.add(self.player)

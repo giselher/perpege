@@ -1,7 +1,10 @@
 
-player="Who are you?"
-self="My name is Duster, nice to meet you. Who are you?"
-player="I am Yves"
+requirements = None
 
-#gives the player a new event
-set E_0001
+hallo = [ blubber]
+
+content = { 'player' : "Who are you?",
+            'self' : "My name is Duster. What's your name?",
+            'player' : "I am Ives.",
+            'set' : 'E_0001',
+            }

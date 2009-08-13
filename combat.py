@@ -36,6 +36,8 @@ class Combat:
                                                 'image' : opponent.animations['right'][3],
                                                 'object' : opponent}
             i += 1
+            
+        self.world.state = 'combat'
         
     def key_loop(self):
         for event in pygame.event.get():
