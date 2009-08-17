@@ -1,6 +1,6 @@
 name=Duster
 imageset=Duster.ani.gz
-dialogs=duster_event_test.dlg, duster_intro.dlg,
+dialogs=duster_intro,duster_event_test
 		
 dailly_routine=stand.ta.py
 

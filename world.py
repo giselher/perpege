@@ -114,8 +114,8 @@ class World(object):
             if nearest in self.Actors: 
                 self.player.facing(nearest)
                 nearest.facing(self.player)
-                self.combat.initFight(self.player, [nearest])
-                #self.interface.showDialog(nearest, self.player, self.deq_handler)
+                #self.combat.initFight(self.player, [nearest])
+                self.interface.showDialog(nearest, self.player, self.deq_handler)
                 
         self.MainGroup.add(self.player)
                     

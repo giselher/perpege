@@ -53,7 +53,11 @@ class Reader(object):
                     if _line0 in lists:
                         if ',' in _line1: data =  _line1.split(',')
                         else: data = [_line1]
-                        if '' in data: data.remove('')
+                        _data = []
+                        for i in data:
+                            if i != '':
+                                _data.append(i.strip())
+                        data = _data
                     else:
                         try:
                             data = int(linedata[1])

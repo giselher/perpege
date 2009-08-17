@@ -1,47 +1,45 @@
+import sys
 
 class DEQ_Handler(object):
     
     def __init__(self, player):
         self.player = player
         
-    def getDialog(self, interlocutor): #too much dialogs :P
-        itrl = interlocutor
-        _dialogs = interlocutor.dialogs
-        available_dialogs=[]
-        for dialog in _dialogs:
-            if self.checkRequirementsForDialog(_dialogs[dialog]):
-                available_dialogs.append(dialog)
-                
-        if len(available_dialogs) == 1:
-            dialog = _dialogs[available_dialogs[0]]
-        else:
-            dialog = _dialogs[available_dialogs[0]]
-            for _dialog in available_dialogs[1:]:
-                if len(_dialogs[_dialog]['requirements']) > len(dialog['requirements']):
-                    dialog = _dialogs[_dialog]
-        
+    def getDialog(self, dialogs): #too much dialogs :P
+        sys.path.append('content/story/dialogs')
+        dialog = None
+        max = -1
+        for dlg in dialogs:
+            module = __import__(dlg) 
+            if module.requirements is not None:
+                if self.checkRequirementsForDialog(module.requirements):
+                    _len_req = module.requirements
+                    if len(_len_req) > max:
+                        dialog = module
+                        max = _len_req
+            else:
+                if max == -1:
+                    dialog = module
+
         return dialog
     
-    def checkRequirementsForDialog(self, dialog):
-        _requirements = dialog['requirements']
-        for req in _requirements:
-            if req.startswith('E_'):
-                if not req in self.player.events: return False
-            elif req.startswith('EQ_'):
-                if not req in self.player.quest_events: return False
-                else: 
-                    if self.player.quest_events[req] != _requirements[req]: return False
+    def checkRequirementsForDialog(self, requirements):
+        for req in requirements:
+            if req == 'events':
+                for event in requirements['events']:
+                    if not event in self.player.events:
+                        return False
                     
-        return True
-                    
-    def set(self, string):
-        key_value = string.split("==")
-        key = key_value[0]
-        if key.startswith('E_'):
-            self.player.events.append(key)
-        elif key.startswith('EQ_'):
-            self.player.quest_events[key] = key_value[1]
-        else:
-            print 'set', key
+            elif req in self.player.quest_events:
+                if self.player.quest_events[req] != requirements[req]:
+                    return False
+            else:
+                return False
             
+        return True
+            
+
+    def set(self, key, value):
+        if key == 'event':
+            self.player.events.append(value)
                     

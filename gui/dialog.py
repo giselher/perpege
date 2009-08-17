@@ -1,6 +1,6 @@
 import textwrap
 from pygame.locals import *
-
+        
 class Dialog(object):
     
     def __init__(self, parent, display):
@@ -14,28 +14,12 @@ class Dialog(object):
         
         self.font = pygame.font.SysFont('Monospace', 16, True)
         
-        self.boolChoices = False
-        self.store = {}
-        self.choice = 0
         self.selected = 0
-        self.counter = 0
-        self.name = None
-        self.portrait = None
-        self.owner = None
-        self.player = None
-        self.handler = None
-        self.content = None
-        self.text = []
+        self.choice_dict = {}
         self.choices = []
+        self.text = []
+        self.boolChoices = False
         
-    def initDialog(self, owner, player, handler):
-        self.counter = 0
-        self.content = handler.getDialog(owner)['content']
-        self.owner = owner
-        self.player = player
-        self.handler = handler
-        self.next()
-    
     def key_loop(self, key):
         if key == K_a or key == K_RETURN: 
             if self.boolChoices:
@@ -49,106 +33,85 @@ class Dialog(object):
                 if self.selected != 0: self.selected -= 1
             elif key == K_DOWN: 
                 if self.selected != (len(self.choices) - 1): self.selected += 1
+        
+    def initDialog(self, owner, player, handler):
+        self.dialog = handler.getDialog(owner.dialogs)
+        _content = self.dialog.content.split('\n')
+        for line in _content:
+            if line.strip() == '':
+                _content.remove(line)
+        self.content = _content
+        self.owner = owner
+        self.player = player
+        self.handler = handler
+        self.next()
+        
+    def next(self):
+        self.text = []
+        try:
+            if not self.boolChoices:
+                _line = self.content.pop(0)
+                if _line.startswith('player'):
+                    _line = _line.replace('player', 'player_speak')
+                elif _line.startswith('self'):
+                    _line = _line.replace('self', 'self_speak')
+                eval("self.%s" % _line)
+                return True
+            else:
+                self.boolChoices = False
+                self.goto(self.choice_dict[self.choices[self.selected]])#
+                self.choices = []
+                self.choice_dict = {}
+                self.selected = 0
+        except IndexError:
+            return False
+        
+    def self_speak(self, text):
+        for line in textwrap.wrap(text, 29):
+            self.text.append(self.render(line))
+        self.portrait = self.owner.portrait
+        self.name = self.render(self.owner.name)
+        
+    def player_speak(self, text):
+        for line in textwrap.wrap(text, 29):
+            self.text.append(self.render(line))
+        self.portrait = self.player.portrait
+        self.name = self.render(self.player.name)
+        
+    def add_choice(self, subcontent, summary):
+        self.choices.append(summary)
+        self.choice_dict[summary] = subcontent
+        self.key_loop(K_a)
+        
+    def show_choice(self):
+        self.renderChoice()
+        self.boolChoices = True
+        
+    def goto(self, subcontent):
+        _content = eval('self.dialog.%s' % subcontent).split('\n')
+        for line in _content:
+            if line.strip() == '':
+                _content.remove(line)
+        self.content = _content
+        self.key_loop(K_a)
     
+    def set(self, key, value):
+        self.handler.set(key, value)
+        self.key_loop(K_a)
+        
     def render(self, text):
         return self.font.render(text, True, (0, 0, 0))
     
     def render_selected(self, text):
         return self.font.render(text, True, (255, 255, 255), (0, 0, 0))
-
-    
-    def renderText(self, text):
-        self.text = []
-        text = textwrap.wrap(eval(text), 32)
-        for line in text:
-            self.text.append(self.render(line))
     
     def renderChoice(self):
         self.text = []
         for choice in self.choices:
             if self.selected == self.choices.index(choice):
-                self.text.append(self.render_selected(eval(choice)))
+                self.text.append(self.render_selected(choice))
             else:
-                self.text.append(self.render(eval(choice)))
-                
-        
-    def next(self):
-        if self.boolChoices:
-            if not self.store.has_key('content'):
-                self.store['links'] = []
-                self.store['counter'] = self.counter
-                self.store['content'] = self.content
-                next_link = 'link-content-%d' % self.choice
-            else:
-                last_link = self.store['last-link']
-                self.store['links'].append(last_link)
-                self.store[last_link+'-'+'content'] = self.content
-                self.store[last_link+'-'+'counter'] = self.counter
-                next_link = last_link + "-%d" % self.choice
-            self.counter = 0
-            self.selected = 0
-            self.content = self.content[next_link]
-            self.store['last-link'] = next_link
-            self.boolChoices = False
-            
-        _line1 = None
-        _str_count = str(self.counter)
-        for line in self.content:
-            if line.startswith(_str_count):
-                _line1 = line.split('-')[1]
-                text = self.content[line]
-                if _line1 == 'set': 
-                    self.handler.set(text)
-                    _line1 = None
-                    self.counter += 1
-        print self.store
-        if _line1 is not None:
-            self.counter += 1
-            if _line1 == 'player':
-                self.name = self.render(self.player.name)
-                self.portrait = self.player.portrait
-                self.renderText(text)
-            elif _line1 == 'self':
-                self.name = self.render(self.owner.name)
-                self.portrait = self.owner.portrait
-                self.renderText(text)
-            elif _line1 == 'choice':
-                self.name = self.render(self.player.name)
-                self.protrait = self.player.portrait
-                self.choices = []
-                for i in range(len(text)):
-                    for t in text:
-                        if i == t: self.choices.append(text[t])
-                self.renderChoice()
-                self.boolChoices = True
-
-            return True
-        else:
-            if self.store.has_key('content'):
-                if self.store.has_key('last-link'):
-                    _link = self.store.pop('last-link')
-                    self.content = self.store.pop('%s-content' % _link)
-                    self.counter = self.store.pop('%s-counter' % _link)
-                    self.next()
-                    
-                elif self.store.has_key('links'):
-                    if len(self.store['links']) > 0:
-                        _link = self.store['links'].pop(-1)
-                        self.content = self.store.pop('%s-content' % _link)
-                        self.counter = self.store.pop('%s-counter' % _link)
-                        self.next()
-                    else:
-                        self.store.pop('links')
-                        
-                else:
-                    self.content = self.store.pop('content')
-                    self.counter = self.store.pop('counter')
-                    self.next()
-                return True
-            else:
-                return False
-            
-
+                self.text.append(self.render(choice))
         
     def draw(self): 
         self.surface.blit(self.image, (0, 0))
@@ -160,4 +123,3 @@ class Dialog(object):
             lineno += 18
         if self.boolChoices: self.renderChoice()
         self.display.blit(self.surface, self.rect.topleft)
-        
