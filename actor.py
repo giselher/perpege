@@ -127,4 +127,3 @@ class Player(Actor):
 
     def loop(self):
         self.rect.topleft = (self.crect.x-self.diff_x, self.crect.y-self.diff_y)
-

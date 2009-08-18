@@ -6,10 +6,8 @@ from engine.Misc import *
 from engine import Input
 from gui import Interface
 from combat import Combat
-import pygame
 from pygame.locals import *
-import gzip, os.path, pickle
-import handler
+import pygame, gzip, os.path, pickle, handler
 
 class World(object):
     
@@ -19,6 +17,7 @@ class World(object):
         self.display_center = self.display_rect.center
         
         self.state = 'ift'
+        self.prev_state = 'game'
         
         self.interface = Interface(self, self.display)
         self.interface.menu.store_action('new_game', self.new_game)

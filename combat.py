@@ -28,8 +28,8 @@ class Combat:
         
     def initFight(self, player, opponents):
         self.player = player
-        i = 1
         pos = self.actor_no[len(opponents)]
+        i = 1
         for opponent in opponents:
             _pos = pos * i
             self.opponents[opponent.name] = {   'position' : (_pos, self.getLeftY(_pos)),
@@ -42,7 +42,7 @@ class Combat:
     def key_loop(self):
         for event in pygame.event.get():
             if event.type == KEYDOWN:
-                if event.key == K_ESCAPE: self.world.state = 'game'
+                if event.key == K_ESCAPE: self.world.state = self.world.prev_state
             
     def loop(self):
         self.key_loop()

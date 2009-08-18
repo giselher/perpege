@@ -13,8 +13,10 @@ class DEQ_Handler(object):
             module = __import__(dlg) 
             if module.requirements is not None:
                 if self.checkRequirementsForDialog(module.requirements):
-                    _len_req = module.requirements
-                    if len(_len_req) > max:
+                    _len_req = len(module.requirements)
+                    if module.requirements.has_key('events'): 
+                        _len_req += len(module.requirements['events']) -1
+                    if _len_req > max:
                         dialog = module
                         max = _len_req
             else:

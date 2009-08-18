@@ -99,6 +99,16 @@ class Dialog(object):
         self.handler.set(key, value)
         self.key_loop(K_a)
         
+    def fight(self, opp_list):
+        if 'self' in opp_list:
+            opp_list.remove('self')
+            opp_list.append(self.owner)
+            
+            
+        self.parent.world.prev_state = 'itf'
+        self.parent.world.combat.initFight(self.player, opp_list)
+        self.key_loop(K_a)
+        
     def render(self, text):
         return self.font.render(text, True, (0, 0, 0))
     
