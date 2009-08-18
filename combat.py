@@ -62,3 +62,5 @@ class Combat:
 
         self.display.blit(self.player.animations['left'][3], (799, self.getRightY(799)))
         self.display.blit(self.renderText(self.player.name), (799, self.getRightY(799)-30))
+        
+        self.interface.combat.draw()

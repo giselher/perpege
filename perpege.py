@@ -1,8 +1,6 @@
 #!/usr/bin/env python
-import os, sys
-import pygame
+import os, sys, pygame, settings
 from pygame.locals import *
-import settings
 from engine.Misc import loadImage
 from world import World
 from gui.debug import blit_fps

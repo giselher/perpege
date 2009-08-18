@@ -7,7 +7,7 @@ from engine import Input
 from gui import Interface
 from combat import Combat
 from pygame.locals import *
-import pygame, gzip, os.path, pickle, handler
+import pygame, gzip, os.path, pickle, handler, gss
 
 class World(object):
     
@@ -19,8 +19,13 @@ class World(object):
         self.state = 'ift'
         self.prev_state = 'game'
         
+        self.Saver = gss.Saver('./saves/')
+        self.Loader = gss.Loader('./saves/')
+        
         self.interface = Interface(self, self.display)
         self.interface.menu.store_action('new_game', self.new_game)
+        self.interface.menu.store_action('load_game', self.load_game)
+        self.interface.menu.store_action('save_game', self.save_game)
         self.interface.showMenu('start')
         
         self.combat = Combat(self, self.display, self.interface)
@@ -54,6 +59,25 @@ class World(object):
         self.player.events = []
         self.player.quest_events = {}
                 
+        self.state = 'game'
+        
+    def save_game(self):
+        self.Saver.prepare(self.player.events, 'events')
+        self.Saver.prepare(self.player.quest_events, 'quest_events')
+        self.Saver.prepare(self.player.rect.center, 'position')
+        self.Saver.save('test.sv')
+        
+        self.state = 'game'
+        
+    def load_game(self):
+        self.start_position, image = self.map_maker.makeMap(self.map_reader.readFile('01_test.map'))
+        self.Loader.load('test.sv')
+        self.player.events = self.Loader.get('events')
+        self.player.quest_events = self.Loader.get('quest_events')
+        self.player.rect.center = self.Loader.get('position')
+        self.start_position = self.player.rect.center
+        self.initMap(image)
+        
         self.state = 'game'
 
     def initMap(self, surface):

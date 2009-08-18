@@ -6,7 +6,7 @@ sys.path.append('../')
 from engine.Misc import loadImage
 from dialog import Dialog
 from menu import MainMenu
-#from combat import Combat
+from combat import Combat
 import pygame
 from pygame.locals import *
 
@@ -17,7 +17,7 @@ class Interface(object):
         self.world = world
         self.display = display
         self.menu = MainMenu(self)
-       # self.comabt = Combat(self, display)
+        self.combat = Combat(self, display)
         self.dialog = Dialog(self, display)
         self.state = ''
         

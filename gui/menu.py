@@ -58,8 +58,8 @@ class MainMenu(object):
         self.rect = self.image.get_rect()
 
         self.buttons = [MenuButton(self, 'new_game', _("New Game"), (self.rect.width/2, 150)),
-            MenuButton(self, 'loag_game', _("Load Game"), (self.rect.width/2, 250)),
-            MenuButton(self, 'save_game', _("Save Game"), (self.rect.width/2, 350)),
+            MenuButton(self, 'save_game', _("Save Game"), (self.rect.width/2, 250)),
+            MenuButton(self, 'load_game', _("Load Game"), (self.rect.width/2, 350)),
             MenuButton(self, 'quit', _("Quit"), (self.rect.width/2, 450)),]
                   
         self.buttons[self.sel_button].hover()
