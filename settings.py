@@ -21,11 +21,12 @@ def __cfg_write():
     __cp.set('display', 'resolution', (1024, 768))
     __cp.add_section('game')
     __cp.set('game', 'version', VERSION)
+    __cp.add_section('controls')
     cfg_file = open(__cp_path, 'w')
     __cp.write(cfg_file)
     cfg_file.close()
 
-def init():
+def init():    
     global __cp, __cp_path
     if not os.path.exists(__cp_path):
         __cfg_write()

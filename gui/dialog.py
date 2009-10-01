@@ -14,6 +14,9 @@ class Dialog(object):
         
         self.font = pygame.font.SysFont('Monospace', 16, True)
         
+        self.fight_eventualities = {'win':'', 'lose':''}
+        self.fight_outcome = 'unknown'
+        
         self.selected = 0
         self.choice_dict = {}
         self.choices = []
@@ -49,7 +52,17 @@ class Dialog(object):
     def next(self):
         self.text = []
         try:
-            if not self.boolChoices:
+            if self.boolChoices:
+                self.boolChoices = False
+                self.goto(self.choice_dict[self.choices[self.selected]])
+                self.choices = []
+                self.choice_dict = {}
+                self.selected = 0
+            elif self.fight_outcome != 'unknown':
+                outcome = self.fight_outcome
+                self.fight_outcome = 'unknown'
+                self.goto(self.fight_eventualities[outcome])
+            else:
                 _line = self.content.pop(0)
                 if _line.startswith('player'):
                     _line = _line.replace('player', 'player_speak')
@@ -57,12 +70,7 @@ class Dialog(object):
                     _line = _line.replace('self', 'self_speak')
                 eval("self.%s" % _line)
                 return True
-            else:
-                self.boolChoices = False
-                self.goto(self.choice_dict[self.choices[self.selected]])#
-                self.choices = []
-                self.choice_dict = {}
-                self.selected = 0
+
         except IndexError:
             return False
         
@@ -81,7 +89,7 @@ class Dialog(object):
     def add_choice(self, subcontent, summary):
         self.choices.append(summary)
         self.choice_dict[summary] = subcontent
-        self.key_loop(K_a)
+        self.skip()
         
     def show_choice(self):
         self.renderChoice()
@@ -93,20 +101,26 @@ class Dialog(object):
             if line.strip() == '':
                 _content.remove(line)
         self.content = _content
-        self.key_loop(K_a)
+        self.skip()
     
     def set(self, key, value):
         self.handler.set(key, value)
-        self.key_loop(K_a)
+        self.skip()
         
     def fight(self, opp_list):
         if 'self' in opp_list:
             opp_list.remove('self')
             opp_list.append(self.owner)
             
-            
         self.parent.world.prev_state = 'itf'
-        self.parent.world.combat.initFight(self.player, opp_list)
+        self.parent.world.combat.Fight(self.player, opp_list)
+        
+        
+    def set_fight_outcome(self, key, subcontent):
+        self.fight_eventualities[key] = subcontent
+        self.skip()
+        
+    def skip(self):
         self.key_loop(K_a)
         
     def render(self, text):

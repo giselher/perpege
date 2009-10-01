@@ -137,7 +137,6 @@ class World(object):
             if nearest in self.Actors: 
                 self.player.facing(nearest)
                 nearest.facing(self.player)
-                #self.combat.initFight(self.player, [nearest])
                 self.interface.showDialog(nearest, self.player, self.deq_handler)
                 
         self.MainGroup.add(self.player)
@@ -176,6 +175,7 @@ class World(object):
         self.interface.draw()
         
     def combat_loop(self):
+        print 'comloop'
         self.combat.loop()
         self.combat.draw()
         
@@ -207,6 +207,12 @@ class MapMaker(object):
                 
     def cleanCurrentMap(self):
         pass
+        
+class InputNew(object):
+    
+    def __init__(self):
+        pass
+        
 
 @Cache()
 def loadObject(object_data):

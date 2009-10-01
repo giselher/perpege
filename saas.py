@@ -7,7 +7,7 @@ class SaAS(object):
         self.exp = 0
         self.hitpoints = 100
         
-        #ckangeable by a level-up
+        #changeable by a level-up
         self.strength = 0
         self.dexterity = 0
         

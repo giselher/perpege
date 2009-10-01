@@ -16,7 +16,6 @@ class Combat(object):
         self.opponents = {}
         self.player = None 
         
-
     def draw(self):
         self.surface.blit(self.image, (0, 0))
         self.display.blit(self.surface, self.rect.topleft)

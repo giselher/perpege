@@ -15,6 +15,9 @@ class Combat:
                             2 : 150,
                             1 : 225
                             }
+                            
+        
+        self.outcome = 'unknown'
     
         self.opponents = {}
         self.player = None
@@ -26,8 +29,10 @@ class Combat:
     def initMap(self, surface):
         self.image = surface.copy()
         
-    def initFight(self, player, opponents):
+    def Fight(self, player, opponents):
+        print 'init Fight'
         self.player = player
+        self.outcome = 'unknown'
         pos = self.actor_no[len(opponents)]
         i = 1
         for opponent in opponents:
@@ -45,6 +50,7 @@ class Combat:
                 if event.key == K_ESCAPE: self.world.state = self.world.prev_state
             
     def loop(self):
+        print 'cloop'
         self.key_loop()
         
     def getLeftY(self, x):
