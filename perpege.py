@@ -3,7 +3,7 @@ import os, sys, pygame, settings
 from pygame.locals import *
 from engine.Misc import loadImage
 from world import World
-from gui.debug import blit_fps
+from gui.debug import blit_fps, blit_grid
 
 def init():
     pygame.init()
@@ -46,6 +46,7 @@ def main():
         world.loop()       
           
         blit_fps(clock, screen, (10, 10))
+        blit_grid(screen, 2)
         
         _display_flip()
 

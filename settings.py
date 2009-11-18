@@ -30,6 +30,7 @@ def init():
     global __cp, __cp_path
     if not os.path.exists(__cp_path):
         __cfg_write()
+        __cp.read(__cp_path)
     else:
         __cp.read(__cp_path)
         if not __cp.has_option('game', 'version'):

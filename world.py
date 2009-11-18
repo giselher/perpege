@@ -113,7 +113,6 @@ class World(object):
         #    sprite.drawRects(self.image)
         self.display.blit(self.image, self.rect.topleft)
         group.empty()
-        del group
 
     def key_loop(self):
         for event in pygame.event.get():
