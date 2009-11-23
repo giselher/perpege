@@ -17,6 +17,7 @@ def init():
 def quit():
     settings.quit()
     pygame.quit()
+    print "Ended succesfully."
     sys.exit(0)
     
 def main():
@@ -49,6 +50,8 @@ def main():
         blit_grid(screen, 2)
         
         _display_flip()
+        
+    
 
 
 if __name__ == "__main__":

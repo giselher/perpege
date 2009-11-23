@@ -65,3 +65,23 @@ class Reader(object):
                             data = linedata[1]
                     npcdata[linedata[0]] = data 
         return npcdata
+        
+    def readDlgFile(self, filename):
+        with open(self.path+filename, "r") as f:
+            data = {}
+            txt = f.read()
+            ft_txt = txt.replace("\n", "").replace("{", ":::").replace("}", ":::")
+            parts = ft_txt.split(":::")
+            for key in parts:
+                if ";" in key or "" == key: continue 
+            
+                id = parts.index(key)
+                value = parts[id+1]
+                
+                key = key.replace("=", "").strip()
+                value = value.split(";")
+                value.pop(-1)
+                data[key] = value  
+            
+            return data
+    
