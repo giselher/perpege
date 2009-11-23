@@ -39,11 +39,7 @@ class Dialog(object):
         
     def initDialog(self, owner, player, handler):
         self.dialog = handler.getDialog(owner.dialogs)
-        _content = self.dialog.content.split('\n')
-        for line in _content:
-            if line.strip() == '':
-                _content.remove(line)
-        self.content = _content
+        self.content = self.dialog['content']
         self.owner = owner
         self.player = player
         self.handler = handler
@@ -96,11 +92,7 @@ class Dialog(object):
         self.boolChoices = True
         
     def goto(self, subcontent):
-        _content = eval('self.dialog.%s' % subcontent).split('\n')
-        for line in _content:
-            if line.strip() == '':
-                _content.remove(line)
-        self.content = _content
+        self.content = self.dialog[subcontent]
         self.skip()
     
     def set(self, key, value):

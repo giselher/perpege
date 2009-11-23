@@ -2,7 +2,7 @@
 <map>
 	<name type="str">Test-Map</name>
 	<ground type="str">grounds/Teppich_Test_low.jpg</ground>
-	<player_start_position type="tuple">(700, 600)</player_start_position>
+	<player_start_position type="tuple">(900, 600)</player_start_position>
 	
 	<objects>
 		<object>

@@ -53,7 +53,8 @@ class World(object):
                         'combat': self.combat_loop}
         
     def new_game(self):
-        self.start_position, image = self.map_maker.makeMap(self.map_reader.readFile('01_test.map'))
+        self.start_position, image = \
+            self.map_maker.makeMap(self.map_reader.readMapFile('01_test.map.xml'))
         self.initMap(image)
            
         self.player.events = []
@@ -70,7 +71,8 @@ class World(object):
         self.state = 'game'
         
     def load_game(self):
-        self.start_position, image = self.map_maker.makeMap(self.map_reader.readFile('01_test.map'))
+        self.start_position, image = \
+            self.map_maker.makeMap(self.map_reader.readMapFile('01_test.map.xml'))
         self.Loader.load('test.sv')
         self.player.events = self.Loader.get('events')
         self.player.quest_events = self.Loader.get('quest_events')
@@ -215,17 +217,21 @@ class MapMaker(object):
 
 @Cache()    
 def loadObject(object_data):
+    # object_data[0] ... filename
+    # object_data[1] ... position
     img_file = gzip.open(os.path.join('content/img/', \
-        object_data['file']), 'rb', 1)
+        object_data[0]), 'rb', 1)
     file_data = pickle.load(img_file)
     img_file.close()
     image = pygame.image.fromstring(file_data['image_string'], \
         file_data['size'], file_data['format'])
-    return MovableObject(image, object_data['pos'], file_data['collision_rect'])
+    return MovableObject(image, object_data[1], file_data['collision_rect'])
     
 @Cache()
 def loadActor(data, reader):
-    actor_data = reader.readFile(data['file'])
+    # data[0] ... filename
+    # data[1] ... position
+    actor_data = reader.readFile(data[0])
     _fromstring = pygame.image.fromstring
     img_file = gzip.open(os.path.join('content/ani/', \
         actor_data['imageset']), 'rb', 1)
@@ -238,7 +244,7 @@ def loadActor(data, reader):
             animations[direction].append(_fromstring(image_string, \
                     file_data['size'], file_data['format']))
     portrait = _fromstring(file_data['portrait'], (100, 100), file_data['format'])
-    return Actor(portrait, animations, data['pos'], file_data['collision_rect'], actor_data)
+    return Actor(portrait, animations, data[1], file_data['collision_rect'], actor_data)
 
 def loadPlayer(file):
     _fromstring = pygame.image.fromstring

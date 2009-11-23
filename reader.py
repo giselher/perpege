@@ -12,37 +12,22 @@ import xml.etree.ElementTree as etree
 class Reader(object):
     def __init__(self, main_path):
         self.path = (main_path if main_path[-1] == "/" else main_path+"/")
-        self.readers = {'act' : self.__readActFile,
-                        'map' : self.__readMapFile}
+        self.readers = {'act' : self.__readActFile} # deprecated
         
         self.content = {}
         self.counter = 0
         self.store = {}
         self.boolChoice = False
     
-    def readFile(self, filename):
+    def readFile(self, filename): # deprecated
         with open(self.path+filename) as f:
             for reader in self.readers.keys():
                 if filename.endswith(reader): 
                     data = self.readers[reader](f.readlines())
                     data["filename"] = filename
                     return data
-                
-    def __readMapFile(self, lines):
-        mapdata = dict()
-        lines = ''.join(lines).split(';')
-        for line in lines:
-            if line == '': continue
-            line = line.strip() 
-            if not line.startswith('#'):
-                linedata = line.split('=')
-                if len(linedata) == 2:
-                    if linedata[1].startswith('[') or linedata[1].startswith('(') \
-                            or linedata[1].startswith('"'):
-                        mapdata[linedata[0]] = eval(linedata[1])
-        return mapdata
     
-    def __readActFile(self, lines):
+    def __readActFile(self, lines): # deprecated, will be named 'readActFile(self, filename)'
         lists = ['dialogs']
         npcdata = dict()
         for line in lines:
@@ -91,8 +76,6 @@ class Reader(object):
         type = element.get("type", "str")
         if type == "tuple": return eval("%s(%s)" % (type, element.text))
         else: return eval("%s('%s')" % (type, element.text))
-        
-    
         
     def readMapFile(self, filename):
         data = {"objects"   : [],

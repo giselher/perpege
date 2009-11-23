@@ -47,7 +47,7 @@ def main():
         world.loop()       
           
         blit_fps(clock, screen, (10, 10))
-        blit_grid(screen, 2)
+        #blit_grid(screen, 2)
         
         _display_flip()
         

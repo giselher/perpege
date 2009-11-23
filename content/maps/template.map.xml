@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?> 
+<map>
+	<name type="str"></name>
+	<ground type="str"></ground>
+	<player_start_position type="tuple">(0,0)</player_start_position>
+	
+	<objects>
+		<object>
+			<filename type="str"></filename>
+			<position type="tuple"></position>
+		</object>
+	</objects>
+	
+	<actors>
+		<actor>
+			<filename type="str"></filename>
+			<position type="tuple"></position>
+		</actor>	
+	</actors>
+</map>
