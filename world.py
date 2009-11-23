@@ -207,13 +207,13 @@ class MapMaker(object):
     def cleanCurrentMap(self):
         pass
         
-class InputNew(object):
-    
-    def __init__(self):
-        pass
-        
+#class InputNew(object):
+#    
+#    def __init__(self):
+#        pass
+#        
 
-@Cache()
+@Cache()    
 def loadObject(object_data):
     img_file = gzip.open(os.path.join('content/img/', \
         object_data['file']), 'rb', 1)

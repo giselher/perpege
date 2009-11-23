@@ -6,6 +6,8 @@
 
 # for the python2.5 users
 from __future__ import with_statement
+import xml.etree.ElementTree as etree
+
 
 class Reader(object):
     def __init__(self, main_path):
@@ -84,4 +86,34 @@ class Reader(object):
                 data[key] = value  
             
             return data
+        
+    def __readMapNode(self, element):
+        type = element.get("type", "str")
+        if type == "tuple": return eval("%s(%s)" % (type, element.text))
+        else: return eval("%s('%s')" % (type, element.text))
+        
     
+        
+    def readMapFile(self, filename):
+        data = {"objects"   : [],
+                "actors"    : []
+                }
+                
+        tree = etree.parse(self.path+filename)
+        root = tree.getroot()
+        
+        data["name"] = self.__readMapNode(root.find("name"))
+        data["ground"] = self.__readMapNode(root.find("ground"))
+        data["start_position"] = self.__readMapNode(root.find("player_start_position"))
+        
+        for child in root.getiterator("object"):
+            filename = self.__readMapNode(child.find("filename"))
+            position = self.__readMapNode(child.find("position"))
+            data["objects"].append((filename, position)) 
+            
+        for child in root.getiterator("actor"):
+            filename = self.__readMapNode(child.find("filename"))
+            position = self.__readMapNode(child.find("position"))
+            data["actors"].append((filename, position))
+            
+        return data       
