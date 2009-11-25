@@ -16,7 +16,7 @@ code_sucks = {
 player("Because the code sucks.");
 self("I will talk with Giselher about this problem. Maybe he can solve your problems. I will talk with Giselher about this problem. Maybe he can solve your problems. I will talk with Giselher about this problem. Maybe he can solve your problems. I will talk with Giselher about this problem. Maybe he can solve your problems.");
 goto('end');
-}"I will talk with Giselher about this problem. Maybe he can solve your problems."
+}
 
 graphic_sucks = {
 player("Because the graphic sucks.");
