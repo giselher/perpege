@@ -11,7 +11,7 @@ import xml.etree.ElementTree as etree
 
 class Reader(object):
     def __init__(self, main_path):
-        self.path = (main_path if main_path[-1] == "/" else main_path+"/")
+        self.path = (main_path if main_path[-1] == '/' else main_path+'/')
         self.readers = {'act' : self.__readActFile} # deprecated
         
         self.content = {}
@@ -24,7 +24,7 @@ class Reader(object):
             for reader in self.readers.keys():
                 if filename.endswith(reader): 
                     data = self.readers[reader](f.readlines())
-                    data["filename"] = filename
+                    data['filename'] = filename
                     return data
     
     def __readActFile(self, lines): # deprecated, will be named 'readActFile(self, filename)'
@@ -54,49 +54,58 @@ class Reader(object):
         return npcdata
         
     def readDlgFile(self, filename):
-        with open(self.path+filename, "r") as f:
+        with open(self.path+filename, 'r') as f:
             data = {}
             txt = f.read()
-            ft_txt = txt.replace("\n", "").replace("{", ":::").replace("}", ":::")
-            parts = ft_txt.split(":::")
+            
+            # remove the comments
+            uncomment = txt.split('\n')
+            for line in uncomment:
+                if line.strip().startswith('#'):
+                    uncomment.pop(uncomment.index(line))
+            txt = '\n'.join(uncomment)
+            
+            ft_txt = txt.replace('\n', '').replace('{', ':::').replace('}', ':::')
+            parts = ft_txt.split(':::')
             for key in parts:
-                if ";" in key or "" == key: continue 
+                if ';' in key or '' == key: continue 
             
                 id = parts.index(key)
                 value = parts[id+1]
                 
-                key = key.replace("=", "").strip()
-                value = value.split(";")
+                key = key.replace('=', '').strip()
+                value = value.split(';')
                 value.pop(-1)
                 data[key] = value  
             
             return data
         
     def __readMapNode(self, element):
-        type = element.get("type", "str")
-        if type == "tuple": return eval("%s(%s)" % (type, element.text))
-        else: return eval("%s('%s')" % (type, element.text))
+        type = element.get('type', 'str')
+        if type == 'tuple': return eval('%s(%s)' % (type, element.text))
+        else: return eval('%s("%s")' % (type, element.text))
         
     def readMapFile(self, filename):
-        data = {"objects"   : [],
-                "actors"    : []
+        data = {'filename'  : filename,
+                'objects'   : [],
+                'actors'    : []
                 }
                 
         tree = etree.parse(self.path+filename)
         root = tree.getroot()
         
-        data["name"] = self.__readMapNode(root.find("name"))
-        data["ground"] = self.__readMapNode(root.find("ground"))
-        data["start_position"] = self.__readMapNode(root.find("player_start_position"))
+        data['name'] = self.__readMapNode(root.find('name'))
+        data['ground'] = self.__readMapNode(root.find('ground'))
+        data['start_position'] = self.__readMapNode(root.find('player_start_position'))
         
-        for child in root.getiterator("object"):
-            filename = self.__readMapNode(child.find("filename"))
-            position = self.__readMapNode(child.find("position"))
-            data["objects"].append((filename, position)) 
+        for child in root.getiterator('object'):
+            filename = self.__readMapNode(child.find('filename'))
+            position = self.__readMapNode(child.find('position'))
+            data['objects'].append((filename, position)) 
             
-        for child in root.getiterator("actor"):
-            filename = self.__readMapNode(child.find("filename"))
-            position = self.__readMapNode(child.find("position"))
-            data["actors"].append((filename, position))
+        for child in root.getiterator('actor'):
+            filename = self.__readMapNode(child.find('filename'))
+            position = self.__readMapNode(child.find('position'))
+            data['actors'].append((filename, position))
             
         return data       

@@ -10,7 +10,7 @@ def init():
     settings.init()
     screen = pygame.display.set_mode(settings.gettuple("display", "resolution"))
     if settings.getbool("display", "fullscreen"): pygame.display.toggle_fullscreen()
-    pygame.display.set_caption("Perpege Re-Write")
+    pygame.display.set_caption("Perpege Pre-Alpha")
     pygame.display.set_icon(loadImage("icon.png"))
     return screen
 
@@ -44,10 +44,13 @@ def main():
             else:
                 _post(event)
             
-        world.loop()       
-          
-        blit_fps(clock, screen, (10, 10))
-        #blit_grid(screen, 2)
+        world.loop()   
+            
+        if not '--no-fps' in sys.argv: 
+            blit_fps(clock, screen, (10, 10))
+        if '--grid' in sys.argv:
+            blit_grid(screen, 2)
+        
         
         _display_flip()
         

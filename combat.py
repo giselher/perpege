@@ -50,7 +50,6 @@ class Combat:
                 if event.key == K_ESCAPE: self.world.state = self.world.prev_state
             
     def loop(self):
-        print 'cloop'
         self.key_loop()
         
     def getLeftY(self, x):

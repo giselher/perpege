@@ -30,6 +30,7 @@ class Actor(MovableObject, SaAS):
         self.step = 5 
         self.a_step = 0
         self.i_step = 0
+        
         self.prev_dir = 'none' 
         
 #    def clamp(self, rect):

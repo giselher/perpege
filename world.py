@@ -57,25 +57,32 @@ class World(object):
             self.map_maker.makeMap(self.map_reader.readMapFile('01_test.map.xml'))
         self.initMap(image)
            
+        self.player.prev_dir = 'down'
+        self.player.image = self.player.animations['down'][3]
         self.player.events = []
         self.player.quest_events = {}
                 
         self.state = 'game'
         
     def save_game(self):
+        self.Saver.prepare(self.map_maker.map_filename, 'map_filename')
         self.Saver.prepare(self.player.events, 'events')
         self.Saver.prepare(self.player.quest_events, 'quest_events')
         self.Saver.prepare(self.player.rect.center, 'position')
+        self.Saver.prepare(self.player.animations[self.player.prev_dir].index(self.player.image), 'image_id')
+        self.Saver.prepare(self.player.prev_dir, 'previous_direction')
         self.Saver.save('test.sv')
         
         self.state = 'game'
         
     def load_game(self):
-        self.start_position, image = \
-            self.map_maker.makeMap(self.map_reader.readMapFile('01_test.map.xml'))
         self.Loader.load('test.sv')
+        self.start_position, image = \
+            self.map_maker.makeMap(self.map_reader.readMapFile(self.Loader.get('map_filename')))
         self.player.events = self.Loader.get('events')
         self.player.quest_events = self.Loader.get('quest_events')
+        self.player.prev_dir = self.Loader.get('previous_direction')
+        self.player.image = self.player.animations[self.player.prev_dir][self.Loader.get('image_id')]
         self.player.rect.center = self.Loader.get('position')
         self.start_position = self.player.rect.center
         self.initMap(image)
@@ -121,7 +128,11 @@ class World(object):
             if event.type == KEYDOWN:
                 if event.key == K_ESCAPE: self.interface.showMenu()
                 elif event.key == K_a: self.action()
-                elif event.key == K_c: self.battle()
+                elif event.key == K_f: 
+                    for actor in self.Actors:
+                        if actor.name == "Duster":
+                            self.prev_state = "game"
+                            self.combat.Fight(self.player, [actor])
                     
     def action(self):
         max_dist = 100
@@ -176,7 +187,6 @@ class World(object):
         self.interface.draw()
         
     def combat_loop(self):
-        print 'comloop'
         self.combat.loop()
         self.combat.draw()
         
@@ -191,10 +201,13 @@ class MapMaker(object):
         self.__actors = actor_list
         self.__objects = object_list
         self.act_reader = Reader('content/story/actors/')
+        self.mapName = ''
 
     def makeMap(self, map_id):
         start_position = map_id['start_position']
         image = loadImage(map_id['ground'])
+        self.map_name = map_id['name']
+        self.map_filename = map_id['filename']
         for _object in map_id['objects']:
             loaded_object = loadObject(_object)
             self.__objects.append(loaded_object)
