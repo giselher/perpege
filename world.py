@@ -46,16 +46,13 @@ class World(object):
         self.Objects = []
         self.MainGroup = pygame.sprite.Group(self.player)
         self.map_maker = MapMaker(self.MainGroup, self.Actors, self.Objects)
-        self.map_reader = Reader('content/maps/')
-        
+                
         self.loops = {  'game' : self.game_loop,
                         'itf' : self.itf_loop,
                         'combat': self.combat_loop}
         
     def new_game(self):
-        self.start_position, image = \
-            self.map_maker.makeMap(self.map_reader.readMapFile('01_test.map.xml'))
-        self.initMap(image)
+        self.initMap('01_test.map.xml')
            
         self.player.prev_dir = 'down'
         self.player.image = self.player.animations['down'][3]
@@ -77,28 +74,30 @@ class World(object):
         
     def load_game(self):
         self.Loader.load('test.sv')
-        self.start_position, image = \
-            self.map_maker.makeMap(self.map_reader.readMapFile(self.Loader.get('map_filename')))
+        
         self.player.events = self.Loader.get('events')
         self.player.quest_events = self.Loader.get('quest_events')
         self.player.prev_dir = self.Loader.get('previous_direction')
         self.player.image = self.player.animations[self.player.prev_dir][self.Loader.get('image_id')]
-        self.player.rect.center = self.Loader.get('position')
-        self.start_position = self.player.rect.center
-        self.initMap(image)
-        
+             
+        self.initMap(self.Loader.get('map_filename'), self.Loader.get('position'))
+               
         self.state = 'game'
-
-    def initMap(self, surface):
-        self.ground = surface
-        self.rect = surface.get_rect()
+        
+    def initMap(self, map_name, position=None):
+        self.map_maker.makeMap(map_name)
+        
+        if position: self.map_maker.start_position = position
+        
+        self.ground = self.map_maker.ground_image
+        self.rect = self.ground.get_rect()
         self.image = pygame.Surface(self.rect.size)
-        self.rect.topleft = (self.display_rect.width/2-self.start_position[0],\
-            self.display_rect.height/2 - self.start_position[1])
-        self.player.setCenter(self.start_position)
+        self.rect.topleft = (self.display_rect.width/2-self.map_maker.start_position[0],\
+            self.display_rect.height/2 - self.map_maker.start_position[1])
+        self.player.setCenter(self.map_maker.start_position)
         
-        self.combat.initMap(surface)
-        
+        self.combat.initMap(self.ground)
+
     def check_collision(self, user, col_dict):
         _new = col_dict['new_crect']
         _old = col_dict['old_crect']
@@ -200,12 +199,18 @@ class MapMaker(object):
         self.__draw = draw_group
         self.__actors = actor_list
         self.__objects = object_list
+        self.map_reader = Reader('content/maps/')
         self.act_reader = Reader('content/story/actors/')
-        self.mapName = ''
-
-    def makeMap(self, map_id):
-        start_position = map_id['start_position']
-        image = loadImage(map_id['ground'])
+        
+        self.start_position = (0, 0)
+        self.ground_image = None
+        self.map_name = None
+        self.map_filename = ''
+        
+    def makeMap(self, map_name):
+        map_id = self.map_reader.readMapFile(map_name)
+        self.start_position = map_id['start_position']
+        self.ground_image = loadImage(map_id['ground'])
         self.map_name = map_id['name']
         self.map_filename = map_id['filename']
         for _object in map_id['objects']:
@@ -216,8 +221,6 @@ class MapMaker(object):
             loaded_object = loadActor(_actor, self.act_reader)
             self.__actors.append(loaded_object)
             self.__draw.add(loaded_object)  
-                      
-        return [start_position, image]
                 
     def cleanCurrentMap(self):
         pass

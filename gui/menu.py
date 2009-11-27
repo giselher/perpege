@@ -37,7 +37,13 @@ class MenuButton(pygame.sprite.Sprite):
 
     def store_action(self, function):
         self.function = function
-
+        
+class SaveMenu(object):
+    pass
+    
+class LoadMenu(object):
+    pass
+    
 class MainMenu(SaveMenu, LoadMenu):
     
     def __init__(self, parent, bg_image_path=None):
@@ -103,10 +109,3 @@ class MainMenu(SaveMenu, LoadMenu):
         
     def key_return(self):
         self.buttons[self.sel_button].action()
-        
-class SaveMenu(object):
-    pass
-    
-class LoadMenu(object):
-    pass
-    
