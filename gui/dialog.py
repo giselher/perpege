@@ -70,15 +70,28 @@ class Dialog(object):
         except IndexError:
             return False
         
-    def self_speak(self, text):
+    def render_text(self, text, who):
+        lines = []
         for line in textwrap.wrap(text, 29):
+            lines.append(line)
+        
+        if len(lines) > 7:
+            render_lines = lines[0:6]
+            self.content.insert(0, '%s("%s")' % (who, " ".join(lines[6:])))
+        else:
+            render_lines = lines
+
+        for line in render_lines:
             self.text.append(self.render(line))
+        
+        
+    def self_speak(self, text):
+        self.render_text(text, 'self')                    
         self.portrait = self.owner.portrait
         self.name = self.render(self.owner.name)
         
     def player_speak(self, text):
-        for line in textwrap.wrap(text, 29):
-            self.text.append(self.render(line))
+        self.render_text(text, 'player')
         self.portrait = self.player.portrait
         self.name = self.render(self.player.name)
         
