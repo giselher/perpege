@@ -1,5 +1,5 @@
 
-import pygame, math, gettext
+import pygame, gettext
 from pygame.locals import *
 
 _ = gettext.gettext
@@ -38,7 +38,7 @@ class MenuButton(pygame.sprite.Sprite):
     def store_action(self, function):
         self.function = function
 
-class MainMenu(object):
+class MainMenu(SaveMenu, LoadMenu):
     
     def __init__(self, parent, bg_image_path=None):
         self.parent = parent
@@ -103,3 +103,10 @@ class MainMenu(object):
         
     def key_return(self):
         self.buttons[self.sel_button].action()
+        
+class SaveMenu(object):
+    pass
+    
+class LoadMenu(object):
+    pass
+    

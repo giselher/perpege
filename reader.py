@@ -12,24 +12,14 @@ import xml.etree.ElementTree as etree
 class Reader(object):
     def __init__(self, main_path):
         self.path = (main_path if main_path[-1] == '/' else main_path+'/')
-        self.readers = {'act' : self.__readActFile} # deprecated
+            
+    def readActFile(self, filename):
+        npcdata = {'filename':filename}
         
-        self.content = {}
-        self.counter = 0
-        self.store = {}
-        self.boolChoice = False
-    
-    def readFile(self, filename): # deprecated
         with open(self.path+filename) as f:
-            for reader in self.readers.keys():
-                if filename.endswith(reader): 
-                    data = self.readers[reader](f.readlines())
-                    data['filename'] = filename
-                    return data
-    
-    def __readActFile(self, lines): # deprecated, will be named 'readActFile(self, filename)'
+            lines = f.readlines()
+                
         lists = ['dialogs']
-        npcdata = dict()
         for line in lines:
             line = line.strip()
             if not line.startswith('#') and line != '' :
@@ -80,7 +70,7 @@ class Reader(object):
             
             return data
         
-    def __readMapNode(self, element):
+    def _readMapNode(self, element):
         type = element.get('type', 'str')
         if type == 'tuple': return eval('%s(%s)' % (type, element.text))
         else: return eval('%s("%s")' % (type, element.text))
@@ -94,18 +84,18 @@ class Reader(object):
         tree = etree.parse(self.path+filename)
         root = tree.getroot()
         
-        data['name'] = self.__readMapNode(root.find('name'))
-        data['ground'] = self.__readMapNode(root.find('ground'))
-        data['start_position'] = self.__readMapNode(root.find('player_start_position'))
+        data['name'] = self._readMapNode(root.find('name'))
+        data['ground'] = self._readMapNode(root.find('ground'))
+        data['start_position'] = self._readMapNode(root.find('player_start_position'))
         
         for child in root.getiterator('object'):
-            filename = self.__readMapNode(child.find('filename'))
-            position = self.__readMapNode(child.find('position'))
+            filename = self._readMapNode(child.find('filename'))
+            position = self._readMapNode(child.find('position'))
             data['objects'].append((filename, position)) 
             
         for child in root.getiterator('actor'):
-            filename = self.__readMapNode(child.find('filename'))
-            position = self.__readMapNode(child.find('position'))
+            filename = self._readMapNode(child.find('filename'))
+            position = self._readMapNode(child.find('position'))
             data['actors'].append((filename, position))
             
         return data       

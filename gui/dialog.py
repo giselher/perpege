@@ -17,6 +17,8 @@ class Dialog(object):
         self.fight_eventualities = {'win':'', 'lose':''}
         self.fight_outcome = 'unknown'
         
+        self.lpw = 8 # lines per window
+        
         self.selected = 0
         self.choice_dict = {}
         self.choices = []
@@ -75,15 +77,14 @@ class Dialog(object):
         for line in textwrap.wrap(text, 29):
             lines.append(line)
         
-        if len(lines) > 7:
-            render_lines = lines[0:6]
-            self.content.insert(0, '%s("%s")' % (who, " ".join(lines[6:])))
+        if len(lines) > self.lpw:
+            render_lines = lines[0:self.lpw-1]
+            self.content.insert(0, '%s("%s")' % (who, " ".join(lines[self.lpw:])))
         else:
             render_lines = lines
 
         for line in render_lines:
             self.text.append(self.render(line))
-        
         
     def self_speak(self, text):
         self.render_text(text, 'self')                    
@@ -119,7 +120,6 @@ class Dialog(object):
             
         self.parent.world.prev_state = 'itf'
         self.parent.world.combat.Fight(self.player, opp_list)
-        
         
     def set_fight_outcome(self, key, subcontent):
         self.fight_eventualities[key] = subcontent

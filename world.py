@@ -244,7 +244,7 @@ def loadObject(object_data):
 def loadActor(data, reader):
     # data[0] ... filename
     # data[1] ... position
-    actor_data = reader.readFile(data[0])
+    actor_data = reader.readActFile(data[0])
     _fromstring = pygame.image.fromstring
     img_file = gzip.open(os.path.join('content/ani/', \
         actor_data['imageset']), 'rb', 1)
