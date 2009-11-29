@@ -1,6 +1,7 @@
 # Sorry:This is an old script and the translations sucks, but it works :)
 
-import os, pickle
+import os
+import pickle
 
 class Saver(object):
     """Save Python Objects with an key to load it Later with the GSS Loader an 
@@ -66,12 +67,13 @@ class Loader(object):
         """
         try:
             file = open(self.path + filename, "rb")
-            ldict = pickle.load(file)
-            file.close()
-            self.loaddictonary.update(ldict)
-            self.loaded = True
         except IOError:
             print "IOError: the file \"" + filename + "\" does not exists" 
+        else:
+            dict_ = pickle.load(file)
+            file.close()
+            self.loaddictonary.update(dict_)
+            self.loaded = True
         
     def get(self, key):
         """return Python Object
@@ -79,11 +81,14 @@ class Loader(object):
         returns the Python Object with the given key and remove it from the 
         dictonary. If the dictonary is empty, then you can load another dictonary."""
         if self.loaded == True:
+            
             try:
-                return self.loaddictonary.pop(key)
-                if len(self.loaddictonary.keys()) == 0: self.loaded = False                
+                value = self.loaddictonary.pop(key)
             except KeyError:
                 print "KeyError: Key \"" + key + "\" does not exist"  
+            else:
+                return value
+            
         else:
             print "LoaderError: You have to load a file, before you can use it \nor all values are removed from the dictonary"
             

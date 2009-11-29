@@ -3,9 +3,10 @@
 
 Provides different tools for working with pygame.
 """
-from Decorator import Cache
-import os.path, math
+import math
+import os.path
 import pygame
+from Decorator import Cache
 
 __curdir = os.path.abspath(os.path.curdir)
 __IMAGE_PATH = __curdir

@@ -1,5 +1,11 @@
 import textwrap
 from pygame.locals import *
+
+class EmptyEvent():
+    
+    def __init__(self):
+        self.type = None
+        self.key = None
         
 class Dialog(object):
     
@@ -25,7 +31,9 @@ class Dialog(object):
         self.text = []
         self.boolChoices = False
         
-    def key_loop(self, key):
+    def key_loop(self, event):
+        key = event.key
+                    
         if key == K_a or key == K_RETURN: 
             if self.boolChoices:
                 self.choice = self.selected
@@ -126,7 +134,9 @@ class Dialog(object):
         self.skip()
         
     def skip(self):
-        self.key_loop(K_a)
+        event = EmptyEvent()
+        event.key = K_a
+        self.key_loop(event)
         
     def render(self, text):
         return self.font.render(text, True, (0, 0, 0))

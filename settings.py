@@ -1,4 +1,5 @@
-import os, sys
+import os
+import sys
 from engine import setImagePath
 from ConfigParser import ConfigParser 
 

@@ -1,5 +1,8 @@
 #!/usr/bin/env python
-import os, sys, pygame, settings
+import os
+import sys
+import pygame
+import settings
 from pygame.locals import *
 from engine.Misc import loadImage
 from world import World
@@ -32,18 +35,20 @@ def main():
     world.interface.menu.store_action('quit', quit)
     _post = pygame.event.post
     while True:
-        screen.fill((0, 0, 0))
         clock.tick(35)
         for event in pygame.event.get():
             if event.type == QUIT: quit()
             elif event.type == KEYDOWN:
                 if event.key == K_q: quit()
+                elif event.key == K_F10: pygame.image.save(screen.copy(), 'screenshot.jpg')
                 elif event.key == K_F11: pygame.display.toggle_fullscreen()
                 else:
                     _post(event)
             else:
                 _post(event)
-            
+                
+        screen.fill((0, 0, 0))
+        
         world.loop()   
             
         if not '--no-fps' in sys.argv: 
@@ -53,9 +58,6 @@ def main():
         
         
         _display_flip()
-        
-    
-
 
 if __name__ == "__main__":
     try:

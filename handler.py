@@ -1,4 +1,5 @@
-import sys, reader
+import sys
+import reader
 
 class DEQ_Handler(object):
     
@@ -21,7 +22,7 @@ class DEQ_Handler(object):
 
             if self.checkRequirementsForDialog(self.requirements):
                     _len_req = len(self.requirements)
-                    if self.requirements.has_key('events'): 
+                    if 'events' in self.requirements: 
                         _len_req += len(self.requirements['events']) -1
                     if _len_req > max:
                         dialog = parsed_dialog

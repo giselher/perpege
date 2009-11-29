@@ -1,11 +1,8 @@
-# Attetion: Undocumented
 
-# I hope that you will understand that i will never ever comment this, because i 
-# have written this script in a night i was so tired that i even didn't know what 
-# i am doing and i am happy that this damn script works as it should.
 
-# for the python2.5 users
+# For the python2.5 users!
 from __future__ import with_statement
+
 import xml.etree.ElementTree as etree
 
 
@@ -18,10 +15,12 @@ class Reader(object):
         
         with open(self.path+filename) as f:
             lines = f.readlines()
-                
+        
         lists = ['dialogs']
+        
         for line in lines:
             line = line.strip()
+            
             if not line.startswith('#') and line != '' :
                 linedata = line.split('=')
                 _line0 = linedata[0]
@@ -48,7 +47,7 @@ class Reader(object):
             data = {}
             txt = f.read()
             
-            # remove the comments
+            # Removes the comments.
             uncomment = txt.split('\n')
             for line in uncomment:
                 if line.strip().startswith('#'):
@@ -72,8 +71,10 @@ class Reader(object):
         
     def _readMapNode(self, element):
         type = element.get('type', 'str')
-        if type == 'tuple': return eval('%s(%s)' % (type, element.text))
-        else: return eval('%s("%s")' % (type, element.text))
+        if type == 'tuple': 
+            return eval('%s(%s)' % (type, element.text))
+        else:
+            return eval('%s("%s")' % (type, element.text))
         
     def readMapFile(self, filename):
         data = {'filename'  : filename,

@@ -1,13 +1,17 @@
+import os.path
+import pickle
+import gzip
+import pygame
+import gss
+import handler
 from actor import Actor, Player
 from reader import Reader
-from engine.Decorator import Cache
 from engine.Object import MovableObject
 from engine.Misc import *
 from engine import Input
 from gui import Interface
 from combat import Combat
 from pygame.locals import *
-import pygame, gzip, os.path, pickle, handler, gss
 
 class World(object):
     
@@ -15,6 +19,8 @@ class World(object):
         self.display = display_surface
         self.display_rect = self.display.get_rect()
         self.display_center = self.display_rect.center
+        
+        self.delayed_functions = []
         
         self.state = 'ift'
         self.prev_state = 'game'
@@ -61,19 +67,19 @@ class World(object):
                 
         self.state = 'game'
         
-    def save_game(self):
+    def save_game(self, filename):
         self.Saver.prepare(self.map_maker.map_filename, 'map_filename')
         self.Saver.prepare(self.player.events, 'events')
         self.Saver.prepare(self.player.quest_events, 'quest_events')
         self.Saver.prepare(self.player.rect.center, 'position')
         self.Saver.prepare(self.player.animations[self.player.prev_dir].index(self.player.image), 'image_id')
         self.Saver.prepare(self.player.prev_dir, 'previous_direction')
-        self.Saver.save('test.sv')
+        self.Saver.save(filename)
         
         self.state = 'game'
         
-    def load_game(self):
-        self.Loader.load('test.sv')
+    def load_game(self, filename):
+        self.Loader.load(filename)
         
         self.player.events = self.Loader.get('events')
         self.player.quest_events = self.Loader.get('quest_events')
@@ -112,6 +118,10 @@ class World(object):
             return _old
         else:
             return _new.clamp(self.ground.get_rect())
+        
+    def add_delayed_function(self, function):
+        """Store a function to be called in the next main loop."""
+        self.delayed_functions.append(function)
         
     def draw(self):
         group = zOrder(self.MainGroup)
@@ -190,6 +200,11 @@ class World(object):
         self.combat.draw()
         
     def loop(self):
+        if len(self.delayed_functions) > 0:
+            for func in self.delayed_functions:
+                self.delayed_functions.remove(func)
+                func()
+                
         self.loops[self.state]()
 
         

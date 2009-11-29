@@ -3,13 +3,18 @@ Perpeg gui elements.
 """
 import sys
 sys.path.append('../')
+import pygame
 from engine.Misc import loadImage
 from dialog import Dialog
 from menu import MainMenu
 from combat import Combat
-import pygame
 from pygame.locals import *
 
+class EmptyEvent():
+    
+    def __init__(self):
+        self.type = None
+        self.key = None
 
 class Interface(object):
     
@@ -19,6 +24,7 @@ class Interface(object):
         self.menu = MainMenu(self)
         self.combat = Combat(self, display)
         self.dialog = Dialog(self, display)
+        self.savegame_image = None
         self.state = ''
         
     def showDialog(self, owner, player, handler):
@@ -31,17 +37,19 @@ class Interface(object):
         self.state = 'menu'
         self.world.state = 'itf'
         
-    def key_loop(self):
+    def return_event(self):
         for event in pygame.event.get():
             if event.type == KEYDOWN:
-                return event.key
-        
+                return event
+        else:
+            return EmptyEvent()
+                   
     def draw(self):
         if self.state == 'menu':
-            self.menu.key_loop(self.key_loop())
+            self.menu.key_loop(self.return_event())
             self.menu.draw(self.display)
         elif self.state == 'dialog':
-            self.dialog.key_loop(self.key_loop())
+            self.dialog.key_loop(self.return_event())
             self.dialog.draw()
         else:
             self.world.state = 'game'
