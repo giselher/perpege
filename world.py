@@ -72,7 +72,8 @@ class World(object):
         self.Saver.prepare(self.player.events, 'events')
         self.Saver.prepare(self.player.quest_events, 'quest_events')
         self.Saver.prepare(self.player.rect.center, 'position')
-        self.Saver.prepare(self.player.animations[self.player.prev_dir].index(self.player.image), 'image_id')
+        self.Saver.prepare(self.player.animations[ \
+            self.player.prev_dir].index(self.player.image), 'image_id')
         self.Saver.prepare(self.player.prev_dir, 'previous_direction')
         self.Saver.save(filename)
         
@@ -84,7 +85,8 @@ class World(object):
         self.player.events = self.Loader.get('events')
         self.player.quest_events = self.Loader.get('quest_events')
         self.player.prev_dir = self.Loader.get('previous_direction')
-        self.player.image = self.player.animations[self.player.prev_dir][self.Loader.get('image_id')]
+        self.player.image = self.player.animations[self.player.prev_dir] \
+            [self.Loader.get('image_id')]
              
         self.initMap(self.Loader.get('map_filename'), self.Loader.get('position'))
                

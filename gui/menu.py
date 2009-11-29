@@ -30,13 +30,13 @@ class MenuButton(pygame.sprite.Sprite):
         return self.font.render(text, True, (255, 255, 255))
         
     def hover(self):
-        self.image = pygame.transform.scale(self.image, \
+        self.image = pygame.transform.scale(self.image, 
             (self.rect.width * 2, self.rect.height * 2))
         self.rect = self.image.get_rect()
         exec('self.rect.%s = %s' % (self.align, str(self.position)))
         
     def normal(self):
-        self.image = pygame.transform.scale(self.image, \
+        self.image = pygame.transform.scale(self.image, 
             (self.rect.width / 2, self.rect.height / 2))
         self.rect = self.image.get_rect()
         exec('self.rect.%s = %s' % (self.align, str(self.position)))
@@ -52,25 +52,33 @@ class SaveGameSlot(MenuButton):
     
     def __init__(self, parent, name, text, position, align):
         MenuButton.__init__(self, parent, name, text, position, align)
+        self.slot_no = name[-1]
         self.parent = parent
         self.filename = '%s.sv' % name
+        self.emtpy_text = text
         
         if os.path.exists('saves/%s' % self.filename):
             self.parent.parent.world.Loader.load(self.filename)
             self.save_name = self.parent.parent.world.Loader.get('slot_name')
+            self.text = self.save_name
             self.slot_render()
             self.normal()
+            self.load_active = True
         else:
-            self.save_name = ''
+            self.save_name = text
+            self.slot_render()
+            self.normal()
+            self.load_active = False
         
     def slot_render(self, suffix=''):
-        self.image = self.render(self.save_name+suffix)
+        self.image = self.render(self.slot_no+'. '+self.save_name+suffix)
         self.rect = self.image.get_rect()
         self.hover()
 
     def put_char(self, char):
-        self.save_name += char
-        self.slot_render('_')
+        if len(self.save_name) <= 20:
+            self.save_name += char
+            self.slot_render('_')
         
     def remove_char(self):
         if len(self.save_name) > 0:
@@ -80,16 +88,25 @@ class SaveGameSlot(MenuButton):
     def action(self):
         if self.parent.state == 'save':
             self.parent.set_internal_state('enter_name')
+            
+            if self.save_name == self.emtpy_text:
+                self.save_name = ''
+                
             self.slot_render('_')
         else:
-            self.post_action()
+            if self.load_active:
+                self.post_action()
         
     def post_action(self):
         self.slot_render()
+        
         if self.function is not None:
+            
             if self.parent.state == 'save':
+                self.load_active = True
                 self.parent.parent.world.Saver.prepare(self.save_name, \
                     'slot_name')
+                    
             self.function(self.filename)
         
 class MainMenu(object):
@@ -115,15 +132,23 @@ class MainMenu(object):
             
         self.rect = self.image.get_rect()
 
-        self.buttons = [MenuButton(self, 'new_game', _("New Game"), (self.rect.width/2, 150), 'center'),
-            MenuButton(self, 'save_menu', _("Save Game"), (self.rect.width/2, 250), 'center'),
-            MenuButton(self, 'load_menu', _("Load Game"), (self.rect.width/2, 350), 'center'),
-            MenuButton(self, 'quit', _("Quit"), (self.rect.width/2, 450), 'center'),]
+        self.buttons = [MenuButton(self, 'new_game', _("New Game"), 
+                (self.rect.width/2, 150), 'center'),
+            MenuButton(self, 'save_menu', _("Save Game"), 
+                (self.rect.width/2, 250), 'center'),
+            MenuButton(self, 'load_menu', _("Load Game"), 
+                (self.rect.width/2, 350), 'center'),
+            MenuButton(self, 'quit', _("Quit"), \
+                (self.rect.width/2, 450), 'center'),]
             
-        self.save_slots = [SaveGameSlot(self, 'slot1', _('Empty'), (self.rect.width/4, 150), 'topleft'),
-            SaveGameSlot(self, 'slot2', _('Empty'), (self.rect.width/4, 250), 'topleft'),
-            SaveGameSlot(self, 'slot3', _('Empty'), (self.rect.width/4, 350), 'topleft'),
-            MenuButton(self, 'return', _('Return'), (self.rect.width/4, 450), 'topleft')]
+        self.save_slots = [SaveGameSlot(self, 'slot1', _("Empty"), 
+                (self.rect.width/4, 150), 'topleft'),
+            SaveGameSlot(self, 'slot2', _("Empty"), 
+                (self.rect.width/4, 250), 'topleft'),
+            SaveGameSlot(self, 'slot3', _("Empty"), 
+                (self.rect.width/4, 350), 'topleft'),
+            MenuButton(self, 'return', _("Return"), 
+                (self.rect.width/4, 450), 'topleft')]
                   
         self.store_action('save_menu', self.show_save_menu)
         self.store_action('load_menu', self.show_load_menu)
@@ -207,6 +232,12 @@ class MainMenu(object):
     def resume(self):
         if self.state != 'main':
             self.parent.world.add_delayed_function(self.return_to_main)
+            print self.state
+            if self.state == 'enter_name':
+                slot = self.save_slots[self.sel_button]
+                slot.save_name = slot.text
+                slot.slot_render()
+                 
         self.parent.world.state = 'game'        
     
     def key_loop(self, event):   
