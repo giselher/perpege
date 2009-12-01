@@ -112,7 +112,10 @@ class SaveGameSlot(MenuButton):
 class MainMenu(object):
     
     def __init__(self, parent, bg_image_path=None):
+        
         self.parent = parent
+        self.key_map = self.parent.world.key_map
+        
         from __init__ import loadImage
         self.__group = pygame.sprite.Group()
         self.loadImage = loadImage
@@ -232,7 +235,6 @@ class MainMenu(object):
     def resume(self):
         if self.state != 'main':
             self.parent.world.add_delayed_function(self.return_to_main)
-            print self.state
             if self.state == 'enter_name':
                 slot = self.save_slots[self.sel_button]
                 slot.save_name = slot.text
@@ -258,10 +260,10 @@ class MainMenu(object):
                         self.save_slots[self.sel_button].put_char(event.unicode)
                     
         else:
-            
-            if key == K_DOWN: 
+         
+            if key == self.key_map['down']: 
                 self.key_down()
-            elif key == K_UP: 
+            elif key == self.key_map['up']: 
                 self.key_up()
 
     def key_down(self):

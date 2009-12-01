@@ -11,8 +11,8 @@ from gui.debug import blit_fps, blit_grid
 def init():
     pygame.init()
     settings.init()
-    screen = pygame.display.set_mode(settings.gettuple("display", "resolution"))
-    if settings.getbool("display", "fullscreen"): pygame.display.toggle_fullscreen()
+    screen = pygame.display.set_mode(settings.get_tuple("display", "resolution"))
+    if settings.get_bool("display", "fullscreen"): pygame.display.toggle_fullscreen()
     pygame.display.set_caption("Perpege Pre-Alpha")
     pygame.display.set_icon(loadImage("icon.png"))
     return screen
@@ -21,7 +21,7 @@ def quit():
     settings.quit()
     pygame.quit()
     print "Ended succesfully."
-    sys.exit(0)
+    sys.exit()
     
 def main():
     screen = init() 
@@ -30,18 +30,23 @@ def main():
     _display_flip()
     clock = pygame.time.Clock()
 
-    world = World(screen) 
+    world = World(screen, settings) 
+    
+    SCREENSHOT = settings.get_key('screenshot') 
+    TF = settings.get_key('toggle_fullscreen')
 
     world.interface.menu.store_action('quit', quit)
     _post = pygame.event.post
     while True:
         clock.tick(35)
         for event in pygame.event.get():
-            if event.type == QUIT: quit()
+            if event.type == QUIT: 
+                quit()
             elif event.type == KEYDOWN:
-                if event.key == K_q: quit()
-                elif event.key == K_F10: pygame.image.save(screen.copy(), 'screenshot.jpg')
-                elif event.key == K_F11: pygame.display.toggle_fullscreen()
+                if event.key == SCREENSHOT: 
+                    pygame.image.save(screen.copy(), 'screenshot.jpg')
+                elif event.key == TF:
+                    pygame.display.toggle_fullscreen()
                 else:
                     _post(event)
             else:

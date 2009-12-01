@@ -12,6 +12,7 @@ class Dialog(object):
     def __init__(self, parent, display):
         self.parent = parent
         self.display = display
+        self.key_map = self.parent.world.key_map
         from __init__ import loadImage, pygame
         self.image = loadImage('interface/Dialog_Widget.png')
         self.surface = pygame.Surface((500, 200))
@@ -34,7 +35,7 @@ class Dialog(object):
     def key_loop(self, event):
         key = event.key
                     
-        if key == K_a or key == K_RETURN: 
+        if key == self.key_map['action'] or key == K_RETURN: 
             if self.boolChoices:
                 self.choice = self.selected
                 self.next()
@@ -42,9 +43,9 @@ class Dialog(object):
                 if not self.next():
                     self.parent.world.state = 'game'
         if self.boolChoices:
-            if key == K_UP: 
+            if key == self.key_map['up']: 
                 if self.selected != 0: self.selected -= 1
-            elif key == K_DOWN: 
+            elif key == self.key_map['down']: 
                 if self.selected != (len(self.choices) - 1): self.selected += 1
         
     def initDialog(self, owner, player, handler):
@@ -135,7 +136,7 @@ class Dialog(object):
         
     def skip(self):
         event = EmptyEvent()
-        event.key = K_a
+        event.key = self.key_map['action']
         self.key_loop(event)
         
     def render(self, text):

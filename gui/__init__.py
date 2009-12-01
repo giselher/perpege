@@ -24,7 +24,6 @@ class Interface(object):
         self.menu = MainMenu(self)
         self.combat = Combat(self, display)
         self.dialog = Dialog(self, display)
-        self.savegame_image = None
         self.state = ''
         
     def showDialog(self, owner, player, handler):
@@ -43,6 +42,7 @@ class Interface(object):
                 return event
         else:
             return EmptyEvent()
+        
                    
     def draw(self):
         if self.state == 'menu':

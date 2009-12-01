@@ -15,10 +15,13 @@ from pygame.locals import *
 
 class World(object):
     
-    def __init__(self, display_surface):
+    def __init__(self, display_surface, settings):
         self.display = display_surface
         self.display_rect = self.display.get_rect()
         self.display_center = self.display_rect.center
+        
+        self.settings = settings
+        self.key_map = settings.get_key_map()
         
         self.delayed_functions = []
         
@@ -36,7 +39,7 @@ class World(object):
         
         self.combat = Combat(self, self.display, self.interface)
         
-        self.input = Input.I2d2axis()
+        self.input = Input.I2d2axis(self.key_map)
         
         self.step = 10
         
@@ -138,7 +141,7 @@ class World(object):
         for event in pygame.event.get():
             if event.type == KEYDOWN:
                 if event.key == K_ESCAPE: self.interface.showMenu()
-                elif event.key == K_a: self.action()
+                elif event.key == self.key_map['action']: self.action()
                 elif event.key == K_f: 
                     for actor in self.Actors:
                         if actor.name == "Duster":
@@ -160,7 +163,8 @@ class World(object):
             if nearest in self.Actors: 
                 self.player.facing(nearest)
                 nearest.facing(self.player)
-                self.interface.showDialog(nearest, self.player, self.deq_handler)
+                self.interface.showDialog(nearest, \
+                    self.player, self.deq_handler)
                 
         self.MainGroup.add(self.player)
                     
