@@ -243,7 +243,7 @@ class MapMaker(object):
             self.__actors.append(loaded_object)
             self.__draw.add(loaded_object)  
                 
-    def cleanCurrentMap(self):
+    def clear(self):
         pass
         
 #class InputNew(object):
