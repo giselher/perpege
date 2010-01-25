@@ -31,13 +31,13 @@ class World(object):
         self.Saver = gss.Saver('./saves/')
         self.Loader = gss.Loader('./saves/')
         
-        self.interface = Interface(self, self.display)
+        self.interface = Interface(self)
         self.interface.menu.store_action('new_game', self.new_game)
         self.interface.menu.store_action('load_game', self.load_game)
         self.interface.menu.store_action('save_game', self.save_game)
         self.interface.showMenu('start')
         
-        self.combat = Combat(self, self.display, self.interface)
+        self.combat = Combat(self, self.interface.combat)
         
         self.input = Input.I2d2axis(self.key_map)
         

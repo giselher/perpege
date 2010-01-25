@@ -67,6 +67,9 @@ class Actor(MovableObject, SaAS):
                     self.image = self.animations['down'][3]
                 else:
                     self.image = self.animations['right'][3]
+                    
+    def face(self, direction):
+        self.image = self.animations[direction][3]
         
     def move(self, coord):
         crect = self.crect.move(coord)

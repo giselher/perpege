@@ -4,20 +4,16 @@ from pygame.locals import *
 
 class Combat:
     
-    def __init__(self, world, display, interface):
+    def __init__(self, world, interface):
         self.world = world
-        self.display = display
+        self.display = world.display
         self.interface = interface
-        self.display_rect = display.get_rect()
+        self.display_rect = self.display.get_rect()
         self.image = pygame.Surface((0, 0))
-        self.actor_no = {   4 : 75,
-                            3 : 112.5,
-                            2 : 150,
-                            1 : 225
-                            }
-                            
         
         self.outcome = 'unknown'
+
+        self.interface.set_client(self)
     
         self.opponents = {}
         self.player = None
@@ -30,17 +26,13 @@ class Combat:
         self.image = surface.copy()
         
     def Fight(self, player, opponents):
-        print 'init Fight'
         self.player = player
+        self.player.face('right')
         self.outcome = 'unknown'
-        pos = self.actor_no[len(opponents)]
-        i = 1
-        for opponent in opponents:
-            _pos = pos * i
-            self.opponents[opponent.name] = {   'position' : (_pos, self.getLeftY(_pos)),
-                                                'image' : opponent.animations['right'][3],
-                                                'object' : opponent}
-            i += 1
+        
+        self.opponent = opponents[0]
+        self.opponent.face('left')
+        self.interface.start()
             
         self.world.state = 'combat'
         
@@ -51,21 +43,10 @@ class Combat:
             
     def loop(self):
         self.key_loop()
-        
-    def getLeftY(self, x):
-        return (x * -2) + self.display_rect.height 
-    
-    def getRightY(self, x):
-        return (x * 2) - (self.display_rect.height + self.display_rect.height/1.666)
-    
+
     def draw(self):
         self.display.blit(self.image, (0, 0))
-        for opnt in self.opponents:
-            pos = self.opponents[opnt]['position']
-            self.display.blit(self.opponents[opnt]['image'], pos)
-            self.display.blit(self.renderText(opnt), (pos[0], pos[1]-30))
-
-        self.display.blit(self.player.animations['left'][3], (799, self.getRightY(799)))
-        self.display.blit(self.renderText(self.player.name), (799, self.getRightY(799)-30))
+        self.display.blit(self.player.image, (300, 300))
+        self.display.blit(self.opponent.image, (600, 300))
         
-        self.interface.combat.draw()
+        self.interface.draw()

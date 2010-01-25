@@ -7,7 +7,7 @@ import pygame
 from engine.Misc import loadImage
 from dialog import Dialog
 from menu import MainMenu
-from combat import Combat
+from combat_gui import Combat
 from pygame.locals import *
 
 class EmptyEvent():
@@ -18,12 +18,12 @@ class EmptyEvent():
 
 class Interface(object):
     
-    def __init__(self, world, display):
+    def __init__(self, world):
         self.world = world
-        self.display = display
+        self.display = world.display
         self.menu = MainMenu(self)
-        self.combat = Combat(self, display)
-        self.dialog = Dialog(self, display)
+        self.combat = Combat(self)
+        self.dialog = Dialog(self, self.display)
         self.state = ''
         
     def showDialog(self, owner, player, handler):
