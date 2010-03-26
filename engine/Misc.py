@@ -23,27 +23,28 @@ def setAllPaths(path):
 def setImagePath(path):
     global __IMAGE_PATH
     __IMAGE_PATH = path
-    
+
 def setSoundPath(path):
     global __SOUND_PATH
     __SOUND_PATH = path
-    
+
 def setVideoPath(path):
     global __VIDEO_PATH
     __VIDEO_PATH = path
-    
+
 def getImagePath():
     global __IMAGE_PATH
     return __IMAGE_PATH
-    
+
 def getSoundPath():
     global __SOUND_PATH
     return __SOUND_PATH
-    
+
 def getVideoPath():
     global __VIDEO_PATH
     return __VIDEO_PATH
 
+@Cache()
 def loadImage(name, colorkey=None):
     """
     Loads images.
@@ -91,17 +92,20 @@ def loadVideo(name):
 
 def zOrder(*groups):
     ordered = pygame.sprite.OrderedUpdates()
-    unordered = pygame.sprite.Group(groups)
+    sprites = pygame.sprite.Group(groups)
+
     counter = 0
-    while True:
-        if len(unordered) == 0: return ordered
-        for sprite in unordered:
+    while len(sprites.sprites()):
+
+        for sprite in sprites.sprites():
             if sprite.rect.y + sprite.rect.height == counter:
                 ordered.add(sprite)
-                unordered.remove(sprite)
+                sprites.remove(sprite)
+
         counter += 1
+
     return ordered
-        
+
 def getDistance(point_a, point_b):
     """
     Pass 2 x-and y-coordinates to get the distance between these 2 points.

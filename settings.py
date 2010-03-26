@@ -1,65 +1,50 @@
 import os
 import sys
 from engine import setImagePath
-from ConfigParser import ConfigParser 
+from ConfigParser import ConfigParser
 from pygame.locals import *
 
-VERSION = '0.0.2'
+class Settings(object):
 
-def __getPath():
-    os_name = sys.platform
-    if os_name == 'linux2':
-        cfg_path = os.path.join(os.environ['HOME'], '.perpege')
-    else:
-        cfg_path = os.path.join(os.path.abspath('.'), 'settings.ini')
-    return cfg_path
+    def __init__(self):
+        self.__parser = ConfigParser()
 
-__cp = ConfigParser()
-__cp_path = __getPath()
+        if os.name == 'posix':
+            self.path = os.path.join(os.environ['HOME'], '.perpege')
+        else:
+            self.path = os.path.join(os.path.abspath('.'), 'settings.ini')
 
-def __cfg_write():
-    global __cp_path
-    cfg_file = open(__cp_path, 'w')
-    default_file = open('./content/default.conf', 'r')
-    cfg_file.write(default_file.read())
-    default_file.close()
-    cfg_file.close()
+        if not os.path.exists(self.path):
+            self.__write()
 
-def init():    
-    global __cp, __cp_path
-    if not os.path.exists(__cp_path):
-        __cfg_write()
-        __cp.read(__cp_path)
-    else:
-        __cp.read(__cp_path)
-        if not __cp.has_option('game', 'version'):
-            __cp.set('display', 'resolution', (1024, 768))
-            __cp.add_section('game')
-            __cp.set('game', 'version', VERSION)
-    setImagePath('./content/')
-    
-def get_key_map():
-    global __cp
-    key_map = {}
-    for key, value in __cp.items('controls'):
-        key_map[key] = eval(value)
-    return key_map
-    
-def get_key(key):
-    global __cp
-    return eval(__cp.get('controls', key))
+        self.__parser.read(self.path)
 
-def get_tuple(section, key):
-    global __cp
-    raw_value = __cp.get(section, key)
-    return eval('tuple(%s)' % raw_value)
+        setImagePath('./content/')
 
-def get_bool(section, key):
-    global __cp
-    return __cp.getboolean(section, key)
+    def __write(self):
+        cfg_file = open(self.path, 'w')
+        default_file = open('./content/default.conf', 'r')
+        cfg_file.write(default_file.read())
+        default_file.close()
+        cfg_file.close()
 
-def quit():
-    global __cp, __cp_path
-    cfg_file = open(__cp_path, 'w')
-    __cp.write(cfg_file)
-    cfg_file.close()
+    def get_key_map(self):
+        key_map = {}
+        for key, value in self.__parser.items('controls'):
+            key_map[key] = eval(value)
+        return key_map
+
+    def get_key(self, key):
+        return eval(self.__parser.get('controls', key))
+
+    def get_tuple(self, section, key):
+        raw_value = self.__parser.get(section, key)
+        return eval('tuple(%s)' % raw_value)
+
+    def get_bool(self, section, key):
+        return self.__parser.getboolean(section, key)
+
+    def quit(self):
+        cfg_file = open(self.path, 'w')
+        self.__parser.write(cfg_file)
+        cfg_file.close()

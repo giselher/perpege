@@ -1,20 +1,40 @@
-<?xml version="1.0" encoding="UTF-8"?> 
+<?xml version="1.0" encoding="UTF-8"?>
 <map>
-	<name type="str"></name>
-	<ground type="str"></ground>
-	<player_start_position type="tuple">(0,0)</player_start_position>
-	
-	<objects>
-		<object>
-			<filename type="str"></filename>
-			<position type="tuple"></position>
-		</object>
-	</objects>
-	
-	<actors>
-		<actor>
-			<filename type="str"></filename>
-			<position type="tuple"></position>
-		</actor>	
-	</actors>
+    <name type="str"></name>
+    <ground type="str"></ground>
+
+    <start>
+        <facing type="str"></facing>
+        <position type="tuple">(0,0)</position>
+    </start>
+
+    <objects>
+        <object>
+            <filename type="str"></filename>
+            <position type="tuple"></position>
+        </object>
+    </objects>
+
+    <actors>
+        <actor>
+            <filename type="str"></filename>
+            <position type="tuple"></position>
+        </actor>
+    </actors>
+
+    <triggers>
+        <trigger>
+            <file type="str" function="superdupper">super.py</file>
+<!--
+   Don't know yet how to solve the triggers
+-->
+            <function type="str">function</function>
+            <position type="tuple"></position>
+            <size type="tuple"></size>
+        </trigger>
+
+        <portal>
+        </portal>
+    </triggers>
+
 </map>
