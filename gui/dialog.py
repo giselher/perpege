@@ -2,12 +2,6 @@ import textwrap
 import pygame
 from pygame.locals import *
 
-class EmptyEvent():
-
-    def __init__(self):
-        self.type = None
-        self.key = None
-
 class Dialog(object):
 
     def __init__(self, parent, display):
@@ -41,11 +35,7 @@ class Dialog(object):
         key = event.key
 
         if key == self.key_map['action'] or key == K_RETURN:
-            if self.bool_choices:
-                self.choice = self.selected
-                self.next()
-            else:
-                self.next()
+            self.next()
 
         if self.bool_choices:
             if key == self.key_map['up']:
@@ -69,7 +59,8 @@ class Dialog(object):
 
         if self.bool_choices:
                 self.bool_choices = False
-                self.goto(self.choices_dict[self.choices_list[self.selected]])
+                self.goto( \
+                    [self.choices_dict[self.choices_list[self.selected]]])
                 self.choices_list = []
                 self.choices_dict = {}
                 self.selected = 0
@@ -125,8 +116,8 @@ class Dialog(object):
         self.render_choices()
         self.bool_choices = True
 
-    def goto(self, subcontent):
-        self.content = self.dialog[subcontent]
+    def goto(self, args):
+        self.content = self.dialog[args[0]][:]
         self.skip()
 
     def set(self, args):
@@ -146,9 +137,7 @@ class Dialog(object):
  #       self.skip()
 
     def skip(self):
-        event = EmptyEvent()
-        event.key = self.key_map['action']
-        self.key_loop(event)
+        self.next()
 
     def render(self, text):
         return self.font.render(text, True, (0, 0, 0))
