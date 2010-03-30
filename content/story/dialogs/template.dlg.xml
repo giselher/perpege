@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<dialog>
+    <requirements>
+        <event>E_0001</event>
+        <event>E_0002</event>
+        <quest state="ACCEPTED">EQ_0000</quest>
+        <item amount="10">Item_Egg</item>
+    </requirements>
+
+    <content>
+        <say who="self">Hi Yves, how do you do?</say>
+        <say who="player">Hi Duster. Well, not really good. The game sucks.</say>
+        <say who="self">Why this?</say>
+        <choices>
+            <choice id="code_sucks">Because the code sucks.</choice>
+            <choice id="graphic_sucks">Because the graphic sucks.</choice>
+            <choice id="nevermind">Nevermind.</choice>
+        </choices>
+    <!-- Have to test if statements are working after choices -->
+        <say who="player"></say>
+    </content>
+</dialog>

@@ -1,48 +1,51 @@
 import sys
-import reader
+import parser
 
-class DEQ_Handler(object):
+class DEQHandler(object):
 
     def __init__(self, player):
         self.player = player
-        self.dlg_reader = reader.Reader("content/story/dialogs")
+        self.parser = parser.Parser("content/story/dialogs")
         self.requirements = {}
         self._req_None = None
 
-    def getDialog(self, dialogs): #too much dialogs :P
+    def get_dialog(self, dialogs): #too much dialogs :P
         dialog = None
         max = -1
-        for dlg in dialogs:
-            self.requirements.clear()
-            parsed_dialog = self.dlg_reader.readDlgFile(dlg)
-            requirements = parsed_dialog['requirements']
 
-            for req in requirements:
-                exec("self._req_%s" % req)
+        for dlg in dialogs:
+
+            p_dialog = self.parser.parse_dialog(dlg)
+            self.requirements = p_dialog['requirements']
 
             if self.check_requirements(self.requirements):
+
                     _len_req = len(self.requirements)
+
                     if 'events' in self.requirements:
                         _len_req += len(self.requirements['events']) -1
+
                     if _len_req > max:
-                        dialog = parsed_dialog
+                        dialog = p_dialog
                         max = _len_req
             else:
                 if max == -1:
-                    dialog = parsed_dialog
+                    dialog = p_dialog
 
         return dialog
 
     def check_requirements(self, requirements):
+
         for req in requirements:
             if req == 'events':
                 for event in requirements['events']:
                     if not event in self.player.events:
                         return False
 
-            elif req in self.player.quest_events:
-                if self.player.quest_events[req] != requirements[req]:
-                    return False
+            elif req == 'quests':
+                for quest in requirements[req]:
+                    if self.player.quests[req] != requirements[req][quest]:
+                        return False
             else:
                 return False
 

@@ -1,8 +1,0 @@
-name=Duster
-imageset=Duster.ani.gz
-dialogs=duster_intro.dlg,duster_event_test.dlg,duster_fight_test_replacement.dlg
-		
-dailly_routine=stand.ta.py
-
-# inventory
-# misc

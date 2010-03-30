@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<dialog>
+    <content>
+        <say who="player">Who are you?</say>
+        <say who="self">My name is Duster. What's your name?</say>
+        <say who="player">I am Ives.</say>
+        <set type="event">E_0001</set>
+    </content>
+</dialog>

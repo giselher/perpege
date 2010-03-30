@@ -5,7 +5,7 @@ import pygame
 import gss
 import handler
 from actor import Actor, Player
-from reader import Reader
+from parser import Parser
 from engine.Object import MovableObject
 from engine.Misc import *
 from engine import Input
@@ -53,7 +53,7 @@ class World(object):
         self.player = loadPlayer('Yves.ani.gz')
         self.player.world = self
 
-        self.deq_handler = handler.DEQ_Handler(self.player)
+        self.deq_handler = handler.DEQHandler(self.player)
 
         self.Actors = []
         self.Objects = []
@@ -70,14 +70,14 @@ class World(object):
         self.player.prev_dir = 'down'
         self.player.image = self.player.animations['down'][3]
         self.player.events = []
-        self.player.quest_events = {}
+        self.player.quests = {}
 
         self.state = 'game'
 
     def save_game(self, filename):
         self.Saver.prepare(self.map_maker.map_filename, 'map_filename')
         self.Saver.prepare(self.player.events, 'events')
-        self.Saver.prepare(self.player.quest_events, 'quest_events')
+        self.Saver.prepare(self.player.quests, 'quest_events')
         self.Saver.prepare(self.player.rect.center, 'position')
         self.Saver.prepare(self.player.animations[ \
             self.player.prev_dir].index(self.player.image), 'image_id')
@@ -90,7 +90,7 @@ class World(object):
         self.Loader.load(filename)
 
         self.player.events = self.Loader.get('events')
-        self.player.quest_events = self.Loader.get('quest_events')
+        self.player.quests = self.Loader.get('quest_events')
         self.player.prev_dir = self.Loader.get('previous_direction')
         self.player.image = self.player.animations[self.player.prev_dir] \
             [self.Loader.get('image_id')]
@@ -124,6 +124,7 @@ class World(object):
         self.rect.topleft = (self.display_rect.width/2-center[0], \
             self.display_rect.height/2-center[1])
 
+        # Keeps the screen inside the ground rect
         if self.rect.x > 0:
             self.rect.x = 0
         elif self.rect.x - self.display_rect.width < -self.rect.width:
@@ -246,8 +247,8 @@ class MapMaker(object):
         self.__draw = draw_group
         self.__actors = actor_list
         self.__objects = object_list
-        self.map_reader = Reader('content/maps/')
-        self.act_reader = Reader('content/story/actors/')
+        self.map_parser = Parser('content/maps/')
+        self.act_parser = Parser('content/story/actors/')
 
         self.start_position = (0, 0)
         self.ground_image = None
@@ -255,7 +256,7 @@ class MapMaker(object):
         self.map_filename = ''
 
     def make(self, map_name):
-        map_id = self.map_reader.readMapFile(map_name)
+        map_id = self.map_parser.parse_map(map_name)
         self.start_position = map_id['start_position']
         self.ground_image = loadImage(map_id['ground'])
         self.map_name = map_id['name']
@@ -265,7 +266,7 @@ class MapMaker(object):
             self.__objects.append(loaded_object)
             self.__draw.add(loaded_object)
         for _actor in map_id['actors']:
-            loaded_object = loadActor(_actor, self.act_reader)
+            loaded_object = loadActor(_actor, self.act_parser)
             self.__actors.append(loaded_object)
             self.__draw.add(loaded_object)
 
@@ -293,10 +294,10 @@ def loadObject(object_data):
     return MovableObject(image, object_data[1], file_data['collision_rect'])
 
 @Cache()
-def loadActor(data, reader):
+def loadActor(data, parser):
     # data[0] ... filename
     # data[1] ... position
-    actor_data = reader.readActFile(data[0])
+    actor_data = parser.parse_actor(data[0])
     _fromstring = pygame.image.fromstring
     img_file = gzip.open(os.path.join('content/ani/', \
         actor_data['imageset']), 'rb', 1)

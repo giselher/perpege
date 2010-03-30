@@ -22,118 +22,128 @@ class Dialog(object):
 
         self.font = pygame.font.SysFont('Monospace', 16, True)
 
-        self.fight_eventualities = {'win':'', 'lose':''}
-        self.fight_outcome = 'unknown'
+  #      self.fight_eventualities = {'win':'', 'lose':''}
+  #      self.fight_outcome = 'unknown'
 
-        self.lpw = 8 # lines per window
+        self.lines_per_window = 8 # lines per window
+
+        # Shows the contents after various choices but not after gotos.
+        # And it works only for the content not subcontents
+        self.post_content = []
 
         self.selected = 0
-        self.choice_dict = {}
-        self.choices = []
+        self.choices_dict = {}
+        self.choices_list = []
         self.text = []
-        self.boolChoices = False
+        self.bool_choices = False
 
     def key_loop(self, event):
         key = event.key
 
         if key == self.key_map['action'] or key == K_RETURN:
-            if self.boolChoices:
+            if self.bool_choices:
                 self.choice = self.selected
                 self.next()
             else:
-                if not self.next():
-                    self.parent.world.state = 'game'
-        if self.boolChoices:
+                self.next()
+
+        if self.bool_choices:
             if key == self.key_map['up']:
                 if self.selected != 0: self.selected -= 1
+
             elif key == self.key_map['down']:
-                if self.selected != (len(self.choices) - 1): self.selected += 1
+                if self.selected != (len(self.choices_list) - 1):
+                    self.selected += 1
 
     def init_dialog(self, owner, player, handler):
-        self.dialog = handler.getDialog(owner.dialogs)
-        self.content = self.dialog['content']
+        dialog = handler.get_dialog(owner.dialogs)
         self.owner = owner
         self.player = player
         self.handler = handler
+        self.dialog = dialog
+        self.content = dialog['content']
         self.next()
 
     def next(self):
         self.text = []
-        try:
-            if self.boolChoices:
-                self.boolChoices = False
-                self.goto(self.choice_dict[self.choices[self.selected]])
-                self.choices = []
-                self.choice_dict = {}
+
+        if self.bool_choices:
+                self.bool_choices = False
+                self.goto(self.choices_dict[self.choices_list[self.selected]])
+                self.choices_list = []
+                self.choices_dict = {}
                 self.selected = 0
-            elif self.fight_outcome != 'unknown':
-                outcome = self.fight_outcome
-                self.fight_outcome = 'unknown'
-                self.goto(self.fight_eventualities[outcome])
+
+    #        elif self.fight_outcome != 'unknown':
+    #            outcome = self.fight_outcome
+    #            self.fight_outcome = 'unknown'
+    #            self.goto(self.fight_eventualities[outcome])
+        else:
+
+            if len(self.content):
+                statement = self.content.pop(0)
+                eval("self.%s(%s)" % (statement[0], str(statement[1:])))
+
             else:
-                _line = self.content.pop(0)
-                if _line.startswith('player'):
-                    _line = _line.replace('player', 'player_speak')
-                elif _line.startswith('self'):
-                    _line = _line.replace('self', 'self_speak')
-                eval("self.%s" % _line)
-                return True
+                if len(self.post_content):
+                    self.content = self.post_content
+                    self.skip()
+                else:
+                    self.finish()
 
-        except IndexError:
-            return False
+    def render_text(self, text, talker):
+        lines = textwrap.wrap(text, 29)
 
-    def render_text(self, text, who):
-        lines = []
-        for line in textwrap.wrap(text, 29):
-            lines.append(line)
-
-        if len(lines) > self.lpw:
-            render_lines = lines[0:self.lpw-1]
-            self.content.insert(0, '%s("%s")' % (who, " ".join(lines[self.lpw:])))
+        if len(lines) > self.lines_per_window:
+            render_lines = lines[0:self.lines_per_window-1]
+            self.content.insert(0, ("say", talker, \
+                " ".join(lines[self.lines_per_window:])))
         else:
             render_lines = lines
 
         for line in render_lines:
             self.text.append(self.render(line))
 
-    def self_speak(self, text):
-        self.render_text(text, 'self')
-        self.portrait = self.owner.portrait
-        self.name = self.render(self.owner.name)
+    def say(self, args):
+        if args[0] == "self":
+            talker = self.owner
+        elif args[0] == "player":
+            talker = self.player
+        self.portrait = talker.portrait
+        self.name = self.render(talker.name)
+        self.render_text(args[1], args[0])
 
-    def player_speak(self, text):
-        self.render_text(text, 'player')
-        self.portrait = self.player.portrait
-        self.name = self.render(self.player.name)
+    def choices(self, args):
+        for choice in args[0]:
+            self.choices_list.append(choice[1])
+            self.choices_dict[choice[1]] = choice[0]
 
-    def add_choice(self, subcontent, summary):
-        self.choices.append(summary)
-        self.choice_dict[summary] = subcontent
-        self.skip()
+        self.content.reverse()
+        for statement in self.content:
+            self.post_content.insert(0, statement)
 
-    def show_choice(self):
-        self.renderChoice()
-        self.boolChoices = True
+        self.render_choices()
+        self.bool_choices = True
 
     def goto(self, subcontent):
         self.content = self.dialog[subcontent]
         self.skip()
 
-    def set(self, key, value):
-        self.handler.set(key, value)
+    def set(self, args):
+        self.handler.set(args[0], args[1])
         self.skip()
 
-    def fight(self, opp_list):
-        if 'self' in opp_list:
-            opp_list.remove('self')
-            opp_list.append(self.owner)
+ #   def fight(self, opp_list):
+ #       if 'self' in opp_list:
+ #           opp_list.remove('self')
+ #           opp_list.append(self.owner)
 
-        self.parent.world.prev_state = 'itf'
-        self.parent.world.combat.Fight(self.player, opp_list)
+ #       self.parent.world.prev_state = 'itf'
+ #       self.parent.world.combat.Fight(self.player, opp_list)
 
-    def set_fight_outcome(self, key, subcontent):
-        self.fight_eventualities[key] = subcontent
-        self.skip()
+ #   def set_fight_outcome(self, key, subcontent):
+ #       self.fight_eventualities[key] = subcontent
+ #       self.skip()
 
     def skip(self):
         event = EmptyEvent()
@@ -146,10 +156,10 @@ class Dialog(object):
     def render_selected(self, text):
         return self.font.render(text, True, (255, 255, 255), (0, 0, 0))
 
-    def renderChoice(self):
+    def render_choices(self):
         self.text = []
-        for choice in self.choices:
-            if self.selected == self.choices.index(choice):
+        for choice in self.choices_list:
+            if self.selected == self.choices_list.index(choice):
                 self.text.append(self.render_selected(choice))
             else:
                 self.text.append(self.render(choice))
@@ -158,9 +168,19 @@ class Dialog(object):
         self.surface.blit(self.image, (0, 0))
         self.surface.blit(self.portrait, (380, 60))
         self.surface.blit(self.name, (382, 32))
+
         lineno = 31
         for line in self.text:
             self.surface.blit(line, (31, lineno))
             lineno += 18
-        if self.boolChoices: self.renderChoice()
+
+        if self.bool_choices:
+            self.render_choices()
+
         self.display.blit(self.surface, self.rect.topleft)
+
+    def finish(self):
+        self.content = []
+        self.text =  []
+        self.post_content = []
+        self.parent.world.state = 'game'
