@@ -18,7 +18,7 @@ class MenuButton(pygame.sprite.Sprite):
 
         self.active = True
 
-        self.font = pygame.font.Font('content/tahoma.ttf', 24)
+        self.font = pygame.font.SysFont('Monospace', 24)
         self.image = self.render(text)
         self.rect = self.image.get_rect()
 
